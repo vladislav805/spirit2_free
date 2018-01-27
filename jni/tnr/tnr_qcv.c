@@ -3,6 +3,8 @@
 
     // See https://android.googlesource.com/kernel/msm/+/android-msm-dory-3.10-lollipop-wear-release/drivers/media/radio/radio-iris.c   radio-iris-transport.c 
 
+#ifndef _TNRQCV
+	#define _TNRQCV
   #define LOGTAG "sftnrqcv"
 
   #include <stdio.h>
@@ -170,7 +172,8 @@
 
   //#define V4L2_CAP_HW_FREQ_SEEK           0x00000400  /* Can do hardware frequency seek  */
 
-  #ifndef v4l2_hw_freq_seek
+ /* #ifndef v4l2_hw_freq_seek__
+  	#define v4l2_hw_freq_seek__
   struct v4l2_hw_freq_seek {
         __u32                 tuner;
         enum v4l2_tuner_type  type;
@@ -180,7 +183,7 @@
         __u32                 spacing;
         __u32                 reserved[7];
   };
-  #endif
+  #endif*/
 
   struct v4l2_hw_freq_seek  v4l_seek;//    = {0};
 
@@ -1605,4 +1608,5 @@ else {
 
     return (curr_extension);
   }
+#endif
 

@@ -1,4 +1,9 @@
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
+int stat(const char *path, struct stat *buf);
     // Utilities: Used by many
 
 #ifndef UTILS_INCLUDED
