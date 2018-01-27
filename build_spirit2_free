@@ -9,11 +9,13 @@ export PROJ="src"
 printf $'Starting...\n'
 
 needInstall=0
+needCompilerLog=0
 
 while [ -n "$1" ]
 do
 	case "$1" in
 		-i) needInstall=1 ;;
+		-v) needCompilerLog=1 ;;
 		*) break ;;
 	esac
 	shift;
@@ -33,7 +35,12 @@ android update project --target android-21 --path . --name $PROJ
 printf $'Done.\n'
 
 printf $'Building C code (ndk)...\n'
-time /home/vlad805/Android/Sdk/ndk-bundle/build/ndk-build 2>/dev/null #2>&1 |grep -i error
+if [ "$needCompilerLog" = "1" ]
+then
+	time /home/vlad805/Android/Sdk/ndk-bundle/build/ndk-build 2>&1 #|grep -i error
+else
+	time /home/vlad805/Android/Sdk/ndk-bundle/build/ndk-build 2>/dev/null
+fi
 printf $'Done.\n'
 
 mv libs/armeabi/s2d libs/armeabi/libs2d.so
