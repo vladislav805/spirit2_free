@@ -1,122 +1,416 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+		id="@+id/gui_pg1_layout_ll"
+		orientation="vertical"
+		layout_width="match_parent"
+		layout_height="match_parent"
+		xmlns:android="http://schemas.android.com/apk/res/android">
 
-<!--
--->
+	<!-- Top display area: record button/indicator top left, volume (speaker image) top right, PS, RT -->
+	<LinearLayout
+			layout_width="match_parent"
+			layout_height="0dip"
+			layout_weight="2"
+			layout_gravity="center"
+			orientation="horizontal" >
+		<!-- Band -->
+		<TextView
+				id="@+id/tv_band"
+				contentDescription="Band"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="0"
+				textSize="12dip"
+				textStyle="normal"
+				text="band"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|center_horizontal"
+				singleLine="true" />
+		<!-- RSSI -->
+		<TextView
+				id="@+id/tv_rssi"
+				contentDescription="RSSI"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
+				textSize="12dip"
+				textStyle="normal"
 
-<!-- Top Level: -->
-<LinearLayout android:id="@+id/gui_pg1_layout_ll" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent"
-  xmlns:android="http://schemas.android.com/apk/res/android">
+				text="rssi"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|center_horizontal"
+				singleLine="true" />
+		<!-- Record -->
+		<ImageView
+				id="@+id/iv_record"
+				contentDescription="Record"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
 
-  <!-- Top display area: record button/indicator top left, volume (speaker image) top right, PS, RT -->
-  <LinearLayout android:layout_width="match_parent" android:layout_height="0dip" android:layout_weight="2" android:layout_gravity="center" android:orientation="horizontal" >
-    <!-- Band -->
-    <TextView android:id="@+id/tv_band"    android:contentDescription="Band"   android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="0" android:textSize="12dip" android:textStyle="normal"
-      android:text="band"  android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:singleLine="true" />
-    <!-- RSSI -->
-    <TextView android:id="@+id/tv_rssi"    android:contentDescription="RSSI"   android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1" android:textSize="12dip" android:textStyle="normal"
-      android:text="rssi"  android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:singleLine="true" />
-    <!-- Record -->
-    <ImageView android:id="@+id/iv_record" android:contentDescription="Record" android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1"
-      android:focusable="true" android:clickable="true" android:src="@drawable/sel_record"              android:scaleType="center" android:layout_centerInParent="true" />
-    <!-- Pilot -->
-    <TextView android:id="@+id/tv_pilot"   android:contentDescription="Pilot"  android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="0" android:textSize="10dip" android:textStyle="normal"
-      android:text="pilot" android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:singleLine="true" />
-    <!-- PS -->
-    <TextView android:id="@+id/tv_ps"      android:contentDescription="RDS PS" android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="4" android:textSize="20dip" android:textStyle="bold"
-      android:text="rdsps" android:textColor="#ffffffff" android:gravity="center"                                                                                       android:singleLine="true"
-      android:shadowColor="#ff000000" android:shadowDy="1.0" />
-    <!-- Speaker/Headset -->
-    <ImageView android:id="@+id/iv_output" android:contentDescription="Output" android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1"
-      android:focusable="true" android:clickable="true" android:src="@drawable/ic_lock_silent_mode_off" android:scaleType="center" />
-    <!-- Volume -->
-    <ImageView android:id="@+id/iv_volume" android:contentDescription="Volume" android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1"
-      android:focusable="true" android:clickable="true" android:src="@drawable/btn_volume"              android:scaleType="center" />
-  </LinearLayout>
+				focusable="true"
+				clickable="true"
+				src="@drawable/sel_record"
+				scaleType="center"
+				layout_centerInParent="true" />
+		<!-- Pilot -->
+		<TextView
+				id="@+id/tv_pilot"
+				contentDescription="Pilot"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="0"
+				textSize="10dip"
+				textStyle="normal"
 
-  <!-- RT -->
-  <LinearLayout android:layout_width="match_parent" android:layout_height="0dip" android:layout_weight="1.2" android:layout_gravity="center" android:orientation="horizontal" >
-    <TextView android:id="@+id/tv_rt" android:contentDescription="RDS RT" android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="4" android:textSize="15dip" android:textStyle="normal"
-     android:textColor="#ffd1d1d1" android:ellipsize="marquee" android:gravity="center_vertical|center_horizontal"
-     android:singleLine="true" android:shadowColor="#74000000" android:shadowDy="-1.0" android:marqueeRepeatLimit="marquee_forever" />
-  </LinearLayout>
+				text="pilot"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|center_horizontal"
+				singleLine="true" />
+		<!-- PS -->
+		<TextView
+				id="@+id/tv_ps"
+				contentDescription="RDS PS"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="4"
+				textSize="20dip"
+				textStyle="bold"
 
-  <!-- Frequency -->
-  <LinearLayout android:layout_width="match_parent" android:layout_height="0dip" android:layout_weight="5" android:orientation="horizontal" >
-    <LinearLayout android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical"
-      android:gravity="center_vertical|center_horizontal" >
-      <TextView android:id="@+id/tv_picl" android:contentDescription="RDS PI" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12dip" android:textStyle="normal"
-        android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:singleLine="true" />
-      <ImageView android:visibility="visible" android:id="@+id/iv_seekdn" android:contentDescription=""         android:src="@drawable/btn_rw" android:background="@drawable/sel_stop_bg"   android:focusable="true" android:clickable="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"      android:layout_marginTop="2dip" android:layout_marginBottom="4dip" android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-        android:layout_alignParentBottom="false" android:layout_alignParentLeft="false"  android:scaleType="center" />
-    </LinearLayout>
-    <LinearLayout android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="3" android:orientation="vertical"
-      android:gravity="center_vertical|center_horizontal" >
-      <TextView android:id="@+id/tv_freq" android:contentDescription="Frequency" android:textSize="70dip" android:gravity="center_vertical|center_vertical" 
-        android:textColor="#32b5e5" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-    </LinearLayout>
-    <LinearLayout android:layout_width="0dip" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical"
-      android:gravity="center_vertical|center_horizontal" >
-      <TextView android:id="@+id/tv_ptyn" android:contentDescription="RDS PT" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12dip" android:textStyle="normal"
-        android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:singleLine="true" />
-      <ImageView android:visibility="visible" android:id="@+id/iv_seekup" android:contentDescription="" android:src="@drawable/btn_ff" android:background="@drawable/sel_stop_bg" android:focusable="true" android:clickable="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dip" android:layout_marginBottom="4dip"      android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-        android:layout_alignParentBottom="false" android:layout_alignParentRight="false" android:scaleType="center" />
-    </LinearLayout>
-  </LinearLayout>
+				text="rdsps"
+				textColor="#ffffffff"
+				gravity="center"
+				singleLine="true"
 
-  <!-- Phase / CDown -->
-  <LinearLayout android:layout_width="match_parent" android:layout_height="0dip" android:layout_weight="1"   android:layout_gravity="center"      android:orientation="horizontal" >
-    <TextView android:id="@+id/tv_svc_count" android:contentDescription="CDown" android:layout_width="0dip"  android:layout_height="match_parent" android:layout_weight="1" android:textSize="14dip" android:textStyle="normal"
-     android:text="count" android:textColor="#ffa3a3a3" android:gravity="center_vertical|left"               android:layout_marginLeft="4dip"     android:singleLine="true" />
-    <TextView android:id="@+id/tv_svc_phase" android:contentDescription="Phase" android:layout_width="0dip"  android:layout_height="match_parent" android:layout_weight="14" android:textSize="14dip" android:textStyle="normal"
-     android:text="phase" android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal"                                       android:singleLine="true"  />
-    <TextView android:id="@+id/tv_svc_cdown" android:contentDescription="CDown" android:layout_width="0dip"  android:layout_height="match_parent" android:layout_weight="1" android:textSize="14dip" android:textStyle="normal"
-     android:text="cdown" android:textColor="#ffa3a3a3" android:gravity="center_vertical|right"              android:layout_marginRight="4dip"    android:singleLine="true" />
-  </LinearLayout>
+				shadowColor="#ff000000"
+				shadowDy="1.0" />
+		<!-- Speaker/Headset -->
+		<ImageView
+				id="@+id/iv_output"
+				contentDescription="Output"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
 
-  <!-- Visualizer/Frequency dial, next, previous, tuner power, menu, audio pause/play -->
-  <LinearLayout android:layout_width="match_parent"                                      android:layout_weight="20"          android:layout_height="0dip"         android:orientation="vertical" >
-    <RelativeLayout android:id="@+id/freq_dial"                                          android:layout_width="match_parent" android:layout_height="match_parent">
-      <ImageView android:id="@+id/iv_prev"        android:contentDescription="Previous"  android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/sel_prev"       android:background="@drawable/sel_prev_bg" android:layout_marginTop="0dip" android:layout_marginLeft="0dip" android:layout_alignParentLeft="true" />
-      <ImageView android:id="@+id/iv_next"        android:contentDescription="Next"      android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/sel_next"       android:background="@drawable/sel_prev_bg" android:layout_marginTop="0dip" android:layout_marginRight="0dip" android:layout_alignParentRight="true" />
-      <ImageView android:id="@+id/frequency_bar"  android:contentDescription="Frequency" android:layout_width="match_parent" android:layout_height="match_parent" android:src="@drawable/dial_frequency" android:layout_centerInParent="true" />
-      <LinearLayout android:id="@+id/vis"
-        android:contentDescription="Visualizer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="50dip"
-        android:layout_marginBottom="70dip"
-        android:visibility="visible"
-      >
-      </LinearLayout>
-      <!-- Tuner Stop -->
-      <ImageView android:visibility="visible" android:id="@+id/iv_stop"         android:contentDescription="Stop" android:src="@drawable/sel_stop" android:background="@drawable/sel_stop_bg"   android:focusable="true" android:clickable="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"      android:layout_marginTop="2dip" android:layout_marginBottom="4dip" android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-        android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"  android:scaleType="center" />
-      <!-- Menu -->
-      <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical"
-        android:layout_alignParentBottom="true" android:layout_centerInParent="true" >
-        <ImageView android:visibility="visible" android:id="@+id/iv_menu"         android:contentDescription="Menu" android:src="@drawable/sel_menu"                                                    android:focusable="true" android:clickable="true"
-          android:layout_width="wrap_content" android:layout_height="wrap_content"      android:layout_marginTop="2dip" android:layout_marginBottom="2dip" android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-          android:layout_alignParentBottom="false" android:layout_centerInParent="true"   android:scaleType="center" />
-        <TextView android:id="@+id/tv_menu" android:contentDescription="" android:layout_width="wrap_content" android:layout_marginBottom="2dip" android:layout_height="wrap_content" android:textSize="14dip" android:textStyle="normal"
-          android:text="MENU" android:textColor="#ffa3a3a3" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_vertical|center_horizontal" android:singleLine="true" />
-      </LinearLayout>
-      <!-- Audio Pause -->
-      <ImageView android:visibility="gone" android:id="@+id/iv_pause"           android:contentDescription="Pause" android:src="@drawable/sel_pause" android:background="@drawable/sel_stop_bg"
-        android:focusable="true" android:clickable="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dip" android:layout_marginBottom="4dip"
-        android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-        android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:scaleType="center" />
-      <!-- Audio Pause/Play -->
-      <ImageView android:visibility="visible" android:id="@+id/iv_paupla"       android:contentDescription="Pause / Play" android:src="@drawable/btn_play" android:background="@drawable/sel_stop_bg"
-        android:focusable="true" android:clickable="true"
-        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dip" android:layout_marginBottom="4dip"
-        android:layout_marginRight="2dip" android:layout_marginLeft="2dip"
-        android:layout_alignParentBottom="true" android:layout_alignParentRight="true" android:scaleType="center" />
-    </RelativeLayout>
-  </LinearLayout>
+				focusable="true"
+				clickable="true"
+				src="@drawable/ic_lock_silent_mode_off"
+				scaleType="center" />
+		<!-- Volume -->
+		<ImageView
+				id="@+id/iv_volume"
+				contentDescription="Volume"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
 
+				focusable="true"
+				clickable="true"
+				src="@drawable/btn_volume"
+				scaleType="center" />
+	</LinearLayout>
+
+	<!-- RT -->
+	<LinearLayout
+			layout_width="match_parent"
+			layout_height="0dip"
+			layout_weight="1.2"
+			layout_gravity="center"
+			orientation="horizontal" >
+		<TextView
+				id="@+id/tv_rt"
+				contentDescription="RDS RT"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="4"
+				textSize="15dip"
+				textStyle="normal"
+				textColor="#ffd1d1d1"
+				ellipsize="marquee"
+				gravity="center_vertical|center_horizontal"
+				singleLine="true"
+				shadowColor="#74000000"
+				shadowDy="-1.0"
+				marqueeRepeatLimit="marquee_forever" />
+	</LinearLayout>
+
+	<!-- Frequency -->
+	<LinearLayout
+			layout_width="match_parent"
+			layout_height="0dip"
+			layout_weight="5"
+			orientation="horizontal" >
+		<LinearLayout
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
+				orientation="vertical"
+				gravity="center_vertical|center_horizontal" >
+			<TextView
+					id="@+id/tv_picl"
+					contentDescription="RDS PI"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					textSize="12dip"
+					textStyle="normal"
+					textColor="#ffa3a3a3"
+					gravity="center_vertical|center_horizontal"
+					singleLine="true" />
+			<ImageView
+					visibility="visible"
+					id="@+id/iv_seekdn"
+					contentDescription=""
+					src="@drawable/btn_rw"
+					background="@drawable/sel_stop_bg"
+					focusable="true"
+					clickable="true"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					layout_marginTop="2dip"
+					layout_marginBottom="4dip"
+					layout_marginRight="2dip"
+					layout_marginLeft="2dip"
+					layout_alignParentBottom="false"
+					layout_alignParentLeft="false"
+					scaleType="center" />
+		</LinearLayout>
+		<LinearLayout
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="3"
+				orientation="vertical"
+				gravity="center_vertical|center_horizontal" >
+			<TextView
+					id="@+id/tv_freq"
+					contentDescription="Frequency"
+					textSize="70dip"
+					gravity="center_vertical|center_vertical"
+					textColor="#32b5e5"
+					textAppearance="?android:attr/textAppearanceLarge"
+					layout_width="wrap_content"
+					layout_height="wrap_content" />
+		</LinearLayout>
+		<LinearLayout
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
+				orientation="vertical"
+				gravity="center_vertical|center_horizontal" >
+			<TextView
+					id="@+id/tv_ptyn"
+					contentDescription="RDS PT"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					textSize="12dip"
+					textStyle="normal"
+					textColor="#ffa3a3a3"
+					gravity="center_vertical|center_horizontal"
+					singleLine="true" />
+			<ImageView
+					visibility="visible"
+					id="@+id/iv_seekup"
+					contentDescription=""
+					src="@drawable/btn_ff"
+					background="@drawable/sel_stop_bg"
+					focusable="true"
+					clickable="true"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					layout_marginTop="2dip"
+					layout_marginBottom="4dip"
+					layout_marginRight="2dip"
+					layout_marginLeft="2dip"
+					layout_alignParentBottom="false"
+					layout_alignParentRight="false"
+					scaleType="center" />
+		</LinearLayout>
+	</LinearLayout>
+
+	<!-- Phase / CDown -->
+	<LinearLayout
+			layout_width="match_parent"
+			layout_height="0dip"
+			layout_weight="1"
+			layout_gravity="center"
+			orientation="horizontal" >
+		<TextView
+				id="@+id/tv_svc_count"
+				contentDescription="CDown"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
+				textSize="14dip"
+				textStyle="normal"
+				text="count"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|left"
+				layout_marginLeft="4dip"
+				singleLine="true" />
+		<TextView
+				id="@+id/tv_svc_phase"
+				contentDescription="Phase"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="14"
+				textSize="14dip"
+				textStyle="normal"
+				text="phase"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|center_horizontal"
+				singleLine="true"  />
+		<TextView
+				id="@+id/tv_svc_cdown"
+				contentDescription="CDown"
+				layout_width="0dip"
+				layout_height="match_parent"
+				layout_weight="1"
+				textSize="14dip"
+				textStyle="normal"
+				text="cdown"
+				textColor="#ffa3a3a3"
+				gravity="center_vertical|right"
+				layout_marginRight="4dip"
+				singleLine="true" />
+	</LinearLayout>
+
+	<!-- Visualizer/Frequency dial, next, previous, tuner power, menu, audio pause/play -->
+	<LinearLayout
+			layout_width="match_parent"
+			layout_weight="20"
+			layout_height="0dip"
+			orientation="vertical" >
+		<RelativeLayout
+				id="@+id/freq_dial"
+				layout_width="match_parent"
+				layout_height="match_parent">
+			<ImageView
+					id="@+id/iv_prev"
+					contentDescription="Previous"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					src="@drawable/sel_prev"
+					background="@drawable/sel_prev_bg"
+					layout_marginTop="0dip"
+					layout_marginLeft="0dip"
+					layout_alignParentLeft="true" />
+			<ImageView
+					id="@+id/iv_next"
+					contentDescription="Next"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					src="@drawable/sel_next"
+					background="@drawable/sel_prev_bg"
+					layout_marginTop="0dip"
+					layout_marginRight="0dip"
+					layout_alignParentRight="true" />
+			<ImageView
+					id="@+id/frequency_bar"
+					contentDescription="Frequency"
+					layout_width="match_parent"
+					layout_height="match_parent"
+					src="@drawable/dial_frequency"
+					layout_centerInParent="true" />
+			<LinearLayout
+					id="@+id/vis"
+					contentDescription="Visualizer"
+					layout_width="match_parent"
+					layout_height="match_parent"
+					layout_marginTop="50dip"
+					layout_marginBottom="70dip"
+					visibility="visible">
+			</LinearLayout>
+			<!-- Tuner Stop -->
+			<ImageView
+					visibility="visible"
+					id="@+id/iv_stop"
+					contentDescription="Stop"
+					src="@drawable/sel_stop"
+					background="@drawable/sel_stop_bg"
+					focusable="true"
+					clickable="true"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					layout_marginTop="2dip"
+					layout_marginBottom="4dip"
+					layout_marginRight="2dip"
+					layout_marginLeft="2dip"
+					layout_alignParentBottom="true"
+					layout_alignParentLeft="true"
+					scaleType="center" />
+			<!-- Menu -->
+			<LinearLayout
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					orientation="vertical"
+					layout_alignParentBottom="true"
+					layout_centerInParent="true" >
+				<ImageView
+						visibility="visible"
+						id="@+id/iv_menu"
+						contentDescription="Menu"
+						src="@drawable/sel_menu"
+						focusable="true"
+						clickable="true"
+						layout_width="wrap_content"
+						layout_height="wrap_content"
+						layout_marginTop="2dip"
+						layout_marginBottom="2dip"
+						layout_marginRight="2dip"
+						layout_marginLeft="2dip"
+						layout_alignParentBottom="false"
+						layout_centerInParent="true"
+						scaleType="center" />
+				<TextView
+						id="@+id/tv_menu"
+						contentDescription=""
+						layout_width="wrap_content"
+						layout_marginBottom="2dip"
+						layout_height="wrap_content"
+						textSize="14dip"
+						textStyle="normal"
+						text="MENU"
+						textColor="#ffa3a3a3"
+						gravity="center_vertical|center_horizontal"
+						layout_gravity="center_vertical|center_horizontal"
+						singleLine="true" />
+			</LinearLayout>
+
+			<!-- Audio Pause -->
+			<ImageView
+					visibility="gone"
+					id="@+id/iv_pause"
+					contentDescription="Pause"
+					src="@drawable/sel_pause"
+					background="@drawable/sel_stop_bg"
+					focusable="true"
+					clickable="true"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					layout_marginTop="2dip"
+					layout_marginBottom="4dip"
+					layout_marginRight="2dip"
+					layout_marginLeft="2dip"
+					layout_alignParentBottom="true"
+					layout_alignParentRight="true"
+					scaleType="center" />
+			<!-- Audio Pause/Play -->
+			<ImageView
+					visibility="visible"
+					id="@+id/iv_paupla"
+					contentDescription="Pause / Play"
+					src="@drawable/btn_play"
+					background="@drawable/sel_stop_bg"
+					focusable="true"
+					clickable="true"
+					layout_width="wrap_content"
+					layout_height="wrap_content"
+					layout_marginTop="2dip"
+					layout_marginBottom="4dip"
+					layout_marginRight="2dip"
+					layout_marginLeft="2dip"
+					layout_alignParentBottom="true"
+					layout_alignParentRight="true"
+					scaleType="center" />
+		</RelativeLayout>
+	</LinearLayout>
 </LinearLayout>
-
