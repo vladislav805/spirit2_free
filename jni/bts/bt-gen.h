@@ -1,8 +1,6 @@
-
-    // Bluetooth/Bluedroid definitions
-    // Derived from Google/Broadcom bt_hci_bdroid.h
-    // Like Google's "cleaned Linux headers" this file is not copyrightable as it contains only definitions/facts
-
+// Bluetooth/Bluedroid definitions
+// Derived from Google/Broadcom bt_hci_bdroid.h
+// Like Google's "cleaned Linux headers" this file is not copyrightable as it contains only definitions/facts
 
 /******************************************************************************
  *
@@ -18,7 +16,7 @@
 #pragma once
 
 #ifdef HAS_BDROID_BUILDCFG
-#include "bdroid_buildcfg.h"
+#	include "bdroid_buildcfg.h"
 #endif
 
 /******************************************************************************
@@ -26,20 +24,20 @@
 ******************************************************************************/
 
 #if __STDC_VERSION__ < 199901L
-#  ifndef FALSE
-#    define FALSE 0
-#  endif
-#  ifndef TRUE
-#    define TRUE (!FALSE)
-#  endif
+#	ifndef FALSE
+#		define FALSE 0
+#	endif
+#	ifndef TRUE
+#		define TRUE (!FALSE)
+#	endif
 #else
-#  include <stdbool.h>
-#  ifndef FALSE
-#    define FALSE  false
-#  endif
-#  ifndef TRUE
-#    define TRUE   true
-#  endif
+#	include <stdbool.h>
+#	ifndef FALSE
+#		define FALSE  false
+#	endif
+#	ifndef TRUE
+#		define TRUE   true
+#	endif
 #endif
 
 #define HCI_ACL_MAX_SIZE 1024
@@ -47,7 +45,7 @@
 
 /* Host/Controller lib internal event ID */
 typedef enum {
-  HC_EVENT_LPM_IDLE_TIMEOUT,
+	HC_EVENT_LPM_IDLE_TIMEOUT,
 } bthc_event_t;
 
 #define MSG_CTRL_TO_HC_CMD             0x0100 /* evt mask used by HC_EVENT_TX_CMD */
@@ -82,24 +80,22 @@ typedef enum {
 **  Type definitions and return values
 ******************************************************************************/
 
-typedef struct
-{
-    uint16_t          event;
-    uint16_t          len;
-    uint16_t          offset;
-    uint16_t          layer_specific;
-    uint8_t           data[];
+typedef struct {
+	uint16_t event;
+	uint16_t len;
+	uint16_t offset;
+	uint16_t layer_specific;
+	uint8_t data[];
 } HC_BT_HDR;
 
 #define BT_HC_HDR_SIZE (sizeof(HC_BT_HDR))
 
-typedef struct _hc_buffer_hdr
-{
-    struct _hc_buffer_hdr *p_next;   /* next buffer in the queue */
-    uint8_t   reserved1;
-    uint8_t   reserved2;
-    uint8_t   reserved3;
-    uint8_t   reserved4;
+typedef struct _hc_buffer_hdr {
+	struct _hc_buffer_hdr *p_next;   /* next buffer in the queue */
+	uint8_t reserved1;
+	uint8_t reserved2;
+	uint8_t reserved3;
+	uint8_t reserved4;
 } HC_BUFFER_HDR_T;
 
 #define BT_HC_BUFFER_HDR_SIZE (sizeof(HC_BUFFER_HDR_T))

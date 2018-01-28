@@ -1,7 +1,6 @@
-
-    // New Bluetooth HAL libbt-vendor.so definitions
-    // Derived from Google/Broadcom bt_vendor_lib.h
-    // Like Google's "cleaned Linux headers" this file is not copyrightable as it contains only definitions/facts
+// New Bluetooth HAL libbt-vendor.so definitions
+// Derived from Google/Broadcom bt_vendor_lib.h
+// Like Google's "cleaned Linux headers" this file is not copyrightable as it contains only definitions/facts
 
 #ifndef BT_VENDOR_LIB_H
 #define BT_VENDOR_LIB_H
@@ -27,7 +26,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_POWER_CTRL,
+	BT_VND_OP_POWER_CTRL,
 
 /*  [operation]
  *      Perform any vendor specific initialization or configuration
@@ -40,7 +39,7 @@ typedef enum {
  *      Must call fwcfg_cb to notify the stack of the completion of vendor
  *      specific initialization once it has been done.
  */
-    BT_VND_OP_FW_CFG,
+	BT_VND_OP_FW_CFG,
 
 /*  [operation]
  *      Perform any vendor specific SCO/PCM configuration on the BT Controller.
@@ -53,7 +52,7 @@ typedef enum {
  *      Must call scocfg_cb to notify the stack of the completion of vendor
  *      specific SCO configuration once it has been done.
  */
-    BT_VND_OP_SCO_CFG,
+	BT_VND_OP_SCO_CFG,
 
 /*  [operation]
  *      Open UART port on where the BT Controller is attached.
@@ -74,7 +73,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_USERIAL_OPEN,
+	BT_VND_OP_USERIAL_OPEN,
 
 /*  [operation]
  *      Close the previously opened UART port.
@@ -85,7 +84,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_USERIAL_CLOSE,
+	BT_VND_OP_USERIAL_CLOSE,
 
 /*  [operation]
  *      Get the LPM idle timeout in milliseconds.
@@ -102,7 +101,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_GET_LPM_IDLE_TIMEOUT,
+	BT_VND_OP_GET_LPM_IDLE_TIMEOUT,
 
 /*  [operation]
  *      Enable or disable LPM mode on BT Controller.
@@ -115,7 +114,7 @@ typedef enum {
  *      Must call lpm_cb to notify the stack of the completion of LPM
  *      disable/enable process once it has been done.
  */
-    BT_VND_OP_LPM_SET_MODE,
+	BT_VND_OP_LPM_SET_MODE,
 
 /*  [operation]
  *      Assert or Deassert LPM WAKE on BT Controller.
@@ -127,7 +126,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_LPM_WAKE_SET_STATE,
+	BT_VND_OP_LPM_WAKE_SET_STATE,
 
 /*  [operation]
  *      Perform any vendor specific commands related to audio state changes.
@@ -139,7 +138,7 @@ typedef enum {
  *  [callback]
  *      None.
  */
-    BT_VND_OP_SET_AUDIO_STATE,
+	BT_VND_OP_SET_AUDIO_STATE,
 
 /*  [operation]
  *      The epilog call to the vendor module so that it can perform any
@@ -153,50 +152,50 @@ typedef enum {
  *      Must call epilog_cb to notify the stack of the completion of vendor
  *      specific epilog process once it has been done.
  */
-    BT_VND_OP_EPILOG,
+	BT_VND_OP_EPILOG,
 } bt_vendor_opcode_t;
 
 /** Power on/off control states */
 typedef enum {
-    BT_VND_PWR_OFF,
-    BT_VND_PWR_ON,
-}  bt_vendor_power_state_t;
+	BT_VND_PWR_OFF,
+	BT_VND_PWR_ON,
+} bt_vendor_power_state_t;
 
 /** Define HCI channel identifier in the file descriptors array
-    used in BT_VND_OP_USERIAL_OPEN operation.
+	used in BT_VND_OP_USERIAL_OPEN operation.
  */
 typedef enum {
-    CH_CMD,     // HCI Command channel
-    CH_EVT,     // HCI Event channel
-    CH_ACL_OUT, // HCI ACL downstream channel
-    CH_ACL_IN,  // HCI ACL upstream channel
+	CH_CMD,     // HCI Command channel
+	CH_EVT,     // HCI Event channel
+	CH_ACL_OUT, // HCI ACL downstream channel
+	CH_ACL_IN,  // HCI ACL upstream channel
 
-    CH_MAX      // Total channels
-}  bt_vendor_hci_channels_t;
+	CH_MAX      // Total channels
+} bt_vendor_hci_channels_t;
 
 /** LPM disable/enable request */
 typedef enum {
-    BT_VND_LPM_DISABLE,
-    BT_VND_LPM_ENABLE,
+	BT_VND_LPM_DISABLE,
+	BT_VND_LPM_ENABLE,
 } bt_vendor_lpm_mode_t;
 
 /** LPM WAKE set state request */
 typedef enum {
-    BT_VND_LPM_WAKE_ASSERT,
-    BT_VND_LPM_WAKE_DEASSERT,
+	BT_VND_LPM_WAKE_ASSERT,
+	BT_VND_LPM_WAKE_DEASSERT,
 } bt_vendor_lpm_wake_state_t;
 
 /** Callback result values */
 typedef enum {
-    BT_VND_OP_RESULT_SUCCESS,
-    BT_VND_OP_RESULT_FAIL,
+	BT_VND_OP_RESULT_SUCCESS,
+	BT_VND_OP_RESULT_FAIL,
 } bt_vendor_op_result_t;
 
 /** audio (SCO) state changes triggering VS commands for configuration */
 typedef struct {
-    uint16_t    handle;
-    uint16_t    peer_codec;
-    uint16_t    state;
+	uint16_t handle;
+	uint16_t peer_codec;
+	uint16_t state;
 } bt_vendor_op_audio_state_t;
 
 /*
@@ -275,61 +274,61 @@ typedef void (*tINT_CMD_CBACK)(void *p_mem);
 typedef uint8_t (*cmd_xmit_cb)(uint16_t opcode, void *p_buf, tINT_CMD_CBACK p_cback);
 
 typedef struct {
-    /** set to sizeof(bt_vendor_callbacks_t) */
-    size_t         size;
+	/** set to sizeof(bt_vendor_callbacks_t) */
+	size_t size;
 
-    /*
-     * Callback and callout functions have implemented in HCI libray
-     * (libbt-hci.so).
-     */
+	/*
+	 * Callback and callout functions have implemented in HCI libray
+	 * (libbt-hci.so).
+	 */
 
-    /* notifies caller result of firmware configuration request */
-    cfg_result_cb  fwcfg_cb;
+	/* notifies caller result of firmware configuration request */
+	cfg_result_cb fwcfg_cb;
 
-    /* notifies caller result of sco configuration request */
-    cfg_result_cb  scocfg_cb;
+	/* notifies caller result of sco configuration request */
+	cfg_result_cb scocfg_cb;
 
-    /* notifies caller result of lpm enable/disable */
-    cfg_result_cb  lpm_cb;
+	/* notifies caller result of lpm enable/disable */
+	cfg_result_cb lpm_cb;
 
-    /* notifies the result of codec setting */
-    cfg_result_cb audio_state_cb;
+	/* notifies the result of codec setting */
+	cfg_result_cb audio_state_cb;
 
-    /* buffer allocation request */
-    malloc_cb   alloc;
+	/* buffer allocation request */
+	malloc_cb alloc;
 
-    /* buffer deallocation request */
-    mdealloc_cb dealloc;
+	/* buffer deallocation request */
+	mdealloc_cb dealloc;
 
-    /* hci command packet transmit request */
-    cmd_xmit_cb xmit_cb;
+	/* hci command packet transmit request */
+	cmd_xmit_cb xmit_cb;
 
-    /* notifies caller completion of epilog process */
-    cfg_result_cb epilog_cb;
+	/* notifies caller completion of epilog process */
+	cfg_result_cb epilog_cb;
 } bt_vendor_callbacks_t;
 
 /*
  * Bluetooth Host/Controller VENDOR Interface
  */
 typedef struct {
-    /** Set to sizeof(bt_vndor_interface_t) */
-    size_t          size;
+	/** Set to sizeof(bt_vndor_interface_t) */
+	size_t size;
 
-    /*
-     * Functions need to be implemented in Vendor libray (libbt-vendor.so).
-     */
+	/*
+	 * Functions need to be implemented in Vendor libray (libbt-vendor.so).
+	 */
 
-    /**
-     * Caller will open the interface and pass in the callback routines
-     * to the implemenation of this interface.
-     */
-    int   (*init)(const bt_vendor_callbacks_t* p_cb, unsigned char *local_bdaddr);
+	/**
+	 * Caller will open the interface and pass in the callback routines
+	 * to the implemenation of this interface.
+	 */
+	int (*init)(const bt_vendor_callbacks_t* p_cb, unsigned char *local_bdaddr);
 
-    /**  Vendor specific operations */
-    int (*op)(bt_vendor_opcode_t opcode, void *param);
+	/**  Vendor specific operations */
+	int (*op)(bt_vendor_opcode_t opcode, void *param);
 
-    /** Closes the interface */
-    void  (*cleanup)(void);
+	/** Closes the interface */
+	void (*cleanup)(void);
 } bt_vendor_interface_t;
 
 
@@ -346,4 +345,3 @@ typedef struct {
 extern const bt_vendor_interface_t BLUETOOTH_VENDOR_LIB_INTERFACE;
 
 #endif /* BT_VENDOR_LIB_H */
-
