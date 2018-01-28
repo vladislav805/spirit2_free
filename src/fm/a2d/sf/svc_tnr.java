@@ -4,17 +4,13 @@
 package fm.a2d.sf;
 
 //import android.app.PendingIntent;
-import android.content.Intent;
 import java.util.TimerTask;
 import java.util.Timer;
-import android.os.Bundle;
+
 import android.os.Handler;
 import android.content.Context;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
-public class svc_tnr implements svc_tap {
+	public class svc_tnr implements svc_tap {
 
   private static int    m_obinits = 1;
 
@@ -209,10 +205,10 @@ public class svc_tnr implements svc_tap {
       if (m_com_api.tuner_state.equals ("Stop")) {            // If tuner is stopped
         m_com_api.tuner_state = "Starting";                             // Starting...
 
-        if (com_uti.file_get (s2d_running_file)) {                      // If "s2d daemon running" file already exists (if still running or was unexpectedly killed)
+        if (com_uti.isFileExists(s2d_running_file)) {                      // If "s2d daemon running" file already exists (if still running or was unexpectedly killed)
           com_uti.file_delete (s2d_running_file);
           com_uti.loge ("HAVE s2d_running_file: " + s2d_running_file);
-          if (com_uti.file_get (s2d_running_file))                      // If we can't delete the "s2d daemon running" file
+          if (com_uti.isFileExists(s2d_running_file))                      // If we can't delete the "s2d daemon running" file
             com_uti.loge ("STILL HAVE after file_delete s2d_running_file: " + s2d_running_file);
         }
         else {
@@ -237,14 +233,14 @@ public class svc_tnr implements svc_tap {
         String test1 = "/data/data/fm.a2d.sf/files/test1";
         String test2 = "/data/data/fm.a2d.sf/files/test2";
 
-        if (com_uti.file_get (test1))
+        if (com_uti.isFileExists(test1))
           com_uti.file_delete (test1);
-        if (com_uti.file_get (test2))
+        if (com_uti.isFileExists(test2))
           com_uti.file_delete (test2);
 
-        if (com_uti.file_get (test1))
+        if (com_uti.isFileExists(test1))
           com_uti.loge ("Can not delete " + test1);
-        if (com_uti.file_get (test2))
+        if (com_uti.isFileExists(test2))
           com_uti.loge ("Can not delete " + test2);
 
                                                                         // Start libs2d.so daemon for test in test mode (Not daemon server mode)
@@ -253,7 +249,7 @@ public class svc_tnr implements svc_tap {
         com_uti.logd ("daemon test ret: " + ret);
 
         long size1 = 0;
-        if (com_uti.file_get (test1)) {
+        if (com_uti.isFileExists(test1)) {
           size1 = com_uti.file_size_get (test1);
           com_uti.logd ("Have file " + test1 + " size1: " + size1);
           if (size1 > 0) {
@@ -267,7 +263,7 @@ public class svc_tnr implements svc_tap {
         }
 
         long size2 = 0;
-        if (com_uti.file_get (test2)) {
+        if (com_uti.isFileExists(test2)) {
           size2 = com_uti.file_size_get (test2);
           com_uti.logd ("Have file " + test2 + " size2: " + size2);
           if (size2 > 0) {
@@ -281,7 +277,7 @@ public class svc_tnr implements svc_tap {
         }
 
         String daemon_bin = daemon_lib;
-        if (size1 <= 0 && com_uti.file_get (daemon_exe)) {
+        if (size1 <= 0 && com_uti.isFileExists(daemon_exe)) {
           daemon_bin = daemon_exe;
         }
 

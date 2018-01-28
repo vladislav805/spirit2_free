@@ -1,49 +1,46 @@
-
-    // Radio Service API:
-
 package fm.a2d.sf;
 
-import android.app.PendingIntent;
+// Radio Service API:
+
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
 
 public class com_api {
 
-	public static Context mContext = null;
+	private Context mContext;
 
 	// Public stats:
 	public int num_api_service_update = 0;
 	public int num_key_set = 0;
 
-
-	// Data / Status / Command that form the Common API:
-
-	// Chassis:   Virtual chassis/box/frame that encloses Tuner and Audio functions and brings them together:
-	// Tuner:   Radio Frequency Tuner Service & Chip, including audio functions like mute, volume and stereo that are on the FM chip
-	// Audio:   Sound Frequency Audio Service & Chip(s), SOC audio and other audio
-
+	/**
+	 * Data / Status / Command that form the Common API:
+	 * Chassis: Virtual chassis/box/frame that encloses Tuner and Audio functions and brings them together:
+	 * Tuner: Radio Frequency Tuner Service & Chip, including audio functions like mute, volume and stereo that are on the FM chip
+	 * Audio: Sound Frequency Audio Service & Chip(s), SOC audio and other audio
+	 */
 
 	// Chassis:
+	// Phase of startup/shutdown for tuner, audio and related components "Starting", "Stopping" and "ERROR" and "Success" messages
+	public String chass_phase = "Pre Init";
+	public String chass_phtmo = "0"; // Phase Timeout seconds if positive, Success if 0, Error code if negative
 
-	public String chass_phase = "Pre Init";                       // Phase of startup/shutdown for tuner, audio and related components    "Starting", "Stopping" and "ERROR" and "Success" messages
-	public String chass_phtmo = "0";                              // Phase Timeout seconds if positive, Success if 0, Error code if negative
+	// Maximum presets, preset frequencies and names
+	public static final int chass_preset_max = 16;
+	public String[] chass_preset_freq = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+	public String[] chass_preset_name = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
 
-	public static final int chass_preset_max = 16;                       // Maximum presets, preset frequencies and names
-	public String[] chass_preset_freq = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",};
-	public String[] chass_preset_name = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",};
-
-	public String chass_plug_aud = "UNK";                            // Audio Plugin
-	public String chass_plug_tnr = "UNK";                            // Tuner Plugin
-
+	public String chass_plug_aud = "UNK"; // Audio Plugin
+	public String chass_plug_tnr = "UNK"; // Tuner Plugin
 
 	// Audio: Sound Frequency Audio Service & Chip(s)
-
 	public String audio_state = "Stop";
 	public String audio_mode = "Digital";
 	public String audio_output = "Headset";
 	public String audio_stereo = "Stereo";
-	public String audio_record_state = "Stop";                       // Stop, Start
+	public String audio_record_state = "Stop"; // Stop, Start
 	public String audioSessionId = "0";
 
 
@@ -58,48 +55,46 @@ public class com_api {
 	//        ... = RO
 	// RW CFG api for tuner_freq & tuner_thresh consistency issues: CFG vs chip current values
 
-	public String tuner_state = "Stop";                           // RW ... api States:   stop, start, pause, resume
+	public String tuner_state = "Stop"; // RW ... api States:   stop, start, pause, resume
 
 	public String tuner_mode = "Receive";
-	public String tuner_api_mode = "UART";                           // Default "" or "UART" or "SHIM"
+	public String tuner_api_mode = "UART"; // Default "" or "UART" or "SHIM"
 	public String tuner_api_state = "Stop";
 
-	public String tuner_band = "";                               // RW CFG set Values:   US, EU, UU
-	public String tuner_freq = "";                               // RW CFG api Values:   String  form: 50.000 - 499.999  (76-108 MHz)
-	public int tuner_freq_int = 0;                                // ""                 Integer form in kilohertz
+	public String tuner_band = ""; // RW CFG set Values:   US, EU, UU
+	public String tuner_freq = ""; // RW CFG api Values:   String  form: 50.000 - 499.999  (76-108 MHz)
+	public int   tuner_freq_int = 0; // ""                 Integer form in kilohertz
 
-	public String tuner_stereo = "";                               // RW CFG set Values:   mono, stereo, switch, blend, ... ?
-	public String tuner_thresh = "";                               // RW CFG api Values:   Seek/scan RSSI threshold
-	public String tuner_seek_state = "Stop";                           // RW ... set States:   stop, up, down
+	public String tuner_stereo = "";         // RW CFG set Values:   mono, stereo, switch, blend, ... ?
+	public String tuner_thresh = "";         // RW CFG api Values:   Seek/scan RSSI threshold
+	public String tuner_seek_state = "Stop"; // RW ... set States:   stop, up, down
 
-	public String tuner_rds_state = "Stop";                           // RW CFG set States:   on, off
-	public String tuner_rds_af_state = "Stop";                           // RW CFG set States:   on, off
-	public String tuner_rds_ta_state = "Stop";                           // RW CFG set States:   on, off
+	public String tuner_rds_state = "Stop";    // RW CFG set States:   on, off
+	public String tuner_rds_af_state = "Stop"; // RW CFG set States:   on, off
+	public String tuner_rds_ta_state = "Stop"; // RW CFG set States:   on, off
 
-	public String tuner_extension = "";                               // RW ... set Values:   Extension (additional commands)
+	public String tuner_extension = ""; // RW ... set Values:   Extension (additional commands)
 
-	public String tuner_rssi = "";                               // ro ... ... Values:   RSSI: 0 - 1000
-	public String tuner_qual = "";                               // ro ... ... Values:   SN 99, SN 30
-	public String tuner_pilot = "";                               // ro ... ... Values:   mono, stereo, 1, 2, blend, ... ?      1.5 ?
+	public String tuner_rssi = "";  // ro ... ... Values:   RSSI: 0 - 1000
+	public String tuner_qual = "";  // ro ... ... Values:   SN 99, SN 30
+	public String tuner_pilot = ""; // ro ... ... Values:   mono, stereo, 1, 2, blend, ... ?      1.5 ?
 
-	public String tuner_rds_pi = "";                               // ro ... ... Values:   0 - 65535
-	public String tuner_rds_picl = "";                               // ro ... ... Values:   North American Call Letters or Hex PI for tuner_rds_pi
-	public String tuner_rds_pt = "";                               // ro ... ... Values:   0 - 31
-	public String tuner_rds_ptyn = "";                               // ro ... ... Values:   Describes tuner_rds_pt (English !)
-	public String tuner_rds_ps = "SpiritF";                               // ro ... ... Values:   RBDS 8 char info or RDS Station
-	public String tuner_rds_rt = "";                               // ro ... ... Values:   64 char
+	public String tuner_rds_pi = "";        // ro ... ... Values:   0 - 65535
+	public String tuner_rds_picl = "";      // ro ... ... Values:   North American Call Letters or Hex PI for tuner_rds_pi
+	public String tuner_rds_pt = "";        // ro ... ... Values:   0 - 31
+	public String tuner_rds_ptyn = "";      // ro ... ... Values:   Describes tuner_rds_pt (English !)
+	public String tuner_rds_ps = "SpiritF"; // ro ... ... Values:   RBDS 8 char info or RDS Station
+	public String tuner_rds_rt = "";        // ro ... ... Values:   64 char
 
-	public String tuner_rds_af = "";                               // ro ... ... Values:   Space separated array of AF frequencies
-	public String tuner_rds_ms = "";                               // ro ... ... Values:   0 - 65535   M/S Music/Speech switch code
-	public String tuner_rds_ct = "";                               // ro ... ... Values:   14 char CT Clock Time & Date
+	public String tuner_rds_af = ""; // ro ... ... Values:   Space separated array of AF frequencies
+	public String tuner_rds_ms = ""; // ro ... ... Values:   0 - 65535   M/S Music/Speech switch code
+	public String tuner_rds_ct = ""; // ro ... ... Values:   14 char CT Clock Time & Date
 
-	public String tuner_rds_tmc = "";                               // ro ... ... Values:   Space separated array of shorts
-	public String tuner_rds_tp = "";                               // ro ... ... Values:   0 - 65535   TP Traffic Program Identification code
-	public String tuner_rds_ta = "";                               // ro ... ... Values:   0 - 65535   TA Traffic Announcement code
-	public String tuner_rds_taf = "";                               // ro ... ... Values:   0 - 2^32-1  TAF TA Frequency
+	public String tuner_rds_tmc = ""; // ro ... ... Values:   Space separated array of shorts
+	public String tuner_rds_tp = "";  // ro ... ... Values:   0 - 65535   TP Traffic Program Identification code
+	public String tuner_rds_ta = "";  // ro ... ... Values:   0 - 65535   TA Traffic Announcement code
+	public String tuner_rds_taf = ""; // ro ... ... Values:   0 - 2^32-1  TAF TA Frequency
 
-
-	// Code:
 
 	private static int m_obinits = 0;
 
@@ -111,20 +106,8 @@ public class com_api {
 		com_uti.logd("context: " + context);
 	}
 
-	private static int request_code = 777;
-
-	public static PendingIntent pend_intent_get(Context context, String key, String val) {
-		Intent intent = new Intent(com_uti.api_action_id);
-		com_uti.logv("context: " + context + "  mContext: " + mContext + "  intent: " + intent + "  key: " + key + "  val: " + val);
-		intent.setClass(context, svc_svc.class);                           // !! Note possible different context and mContext !!
-		intent.putExtra(key, val);
-		request_code++;                                                    // Need a unique value to identify
-		PendingIntent pi = PendingIntent.getService(context, request_code, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		return (pi);
-	}
-
-	///*
-	public void key_set(String key, String val, String key2, String val2) {  // Presets currently require simultaneous preset frequency and name
+	// Presets currently require simultaneous preset frequency and name
+	public void key_set(String key, String val, String key2, String val2) {
 		num_key_set++;
 		com_uti.logd("key: " + key + "  val: " + val + "  key2: " + key2 + "  val2: " + val2);
 		Intent intent = new Intent(com_uti.api_action_id);
@@ -140,13 +123,9 @@ public class com_api {
 		try {
 			com_uti.logd("key: " + key + "  val: " + val);
 			Intent intent = new Intent(com_uti.api_action_id);
-      /*if (intent == null) {
-        com_uti.loge ("intent == null");
-        return;
-      }*/
 
 			//intent.setClass (mContext, svc_svc.class);
-			intent.setComponent(new android.content.ComponentName("fm.a2d.sf", "fm.a2d.sf.svc_svc"));
+			intent.setComponent(new ComponentName("fm.a2d.sf", "fm.a2d.sf.svc_svc"));
 			intent.putExtra(key, val);
 			if (mContext != null)
 				mContext.startService(intent);
@@ -155,30 +134,36 @@ public class com_api {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		;
 	}
 
 	// Send at minimum: phase, cdown and status update
 	public Intent service_update_send(Intent intent, String phase, String cdown) {
-		if (intent == null)                                                 // If for svc_svc and not for phase/cdown/count
+		// If for svc_svc and not for phase/cdown/count
+		if (intent == null) {
 			com_uti.logd("phase: " + phase + "  cdown: " + cdown);
+		}
 
 		chass_phase = phase;
 		chass_phtmo = cdown;
 
-		if (intent == null)                                                 // If no Intent (with more info) passed...
-			intent = new Intent(com_uti.api_result_id);                      // Create a new broadcast result Intent
+		// If no Intent (with more info) passed...
+		if (intent == null) {
+			// Create a new broadcast result Intent
+			intent = new Intent(com_uti.api_result_id);
+		}
 
 		intent.putExtra("chass_phase", chass_phase);
 		intent.putExtra("chass_phtmo", chass_phtmo);
 
 		try {
-			mContext.sendStickyBroadcast(intent);                           // Send Sticky Broadcast w/ all info
+			// Send Sticky Broadcast w/ all info
+			mContext.sendStickyBroadcast(intent);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 
-		com_uti.quiet_ms_sleep(10);                                        // Sleep a bit to give receivers a chance to process. Makes debugging with log messages easier regarding order of state changes
+		// Sleep a bit to give receivers a chance to process. Makes debugging with log messages easier regarding order of state changes
+		com_uti.quiet_ms_sleep(10);
 
 		return (intent);
 	}
@@ -189,21 +174,18 @@ public class com_api {
 
 		Bundle extras = intent.getExtras();
 
-		String new_chass_phase = extras.getString("chass_phase", "");//"extra_detect");
-		//if (! new_chass_phase.equals ("extra_detect"))
-		chass_phase = new_chass_phase;
-
-		String new_chass_phtmo = extras.getString("chass_phtmo", "");//"extra_detect");
-		//if (! new_chass_phtmo.equals ("extra_detect"))
-		chass_phtmo = new_chass_phtmo;
+		chass_phase = extras.getString("chass_phase", "");
+		chass_phtmo = extras.getString("chass_phtmo", "");
 
 		for (int ctr = 0; ctr < com_api.chass_preset_max; ctr++) {
 			String new_chass_preset_freq = extras.getString("chass_preset_freq_" + ctr, "extra_detect");//88500");
 			String new_chass_preset_name = extras.getString("chass_preset_name_" + ctr, "extra_detect");//885");
-			if (!new_chass_preset_freq.equals("extra_detect"))
+			if (!new_chass_preset_freq.equals("extra_detect")) {
 				chass_preset_freq[ctr] = new_chass_preset_freq;
-			if (!new_chass_preset_name.equals("extra_detect"))
+			}
+			if (!new_chass_preset_name.equals("extra_detect")) {
 				chass_preset_name[ctr] = new_chass_preset_name;
+			}
 		}
 
 		String new_audio_state = extras.getString("audio_state", "extra_detect");//stop");

@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 	private static int m_obinits = 0;
 	private static int m_creates = 0;
 
-	public static Context mContext = null;
+	private Context mContext = null;
 	public static com_api m_com_api = null;
 
 	private gui_gap m_gui_gap = null;
@@ -44,12 +44,6 @@ public class MainActivity extends Activity {
 
 		if (m_com_api == null) { // If a receiver has not initialized yet...
 			m_com_api = new com_api(this); // Instantiate Common API class
-			//noinspection ConstantConditions
-			if (m_com_api == null) {
-				com_uti.loge("m_com_api: " + m_com_api);
-			} else {
-				com_uti.logd("m_com_api: " + m_com_api);
-			}
 		}
 
 		//    m_com_api.chass_plug_aud = com_uti.chass_plug_aud_get (mContext);  // Setup Audio Plugin

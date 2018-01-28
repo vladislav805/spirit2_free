@@ -9,7 +9,7 @@
 Spirit Transmit requires 19 / Kitkat + due to new APIs used in svc_rcc and svc_rcc class itself
 -->
 
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="21" />
+	<uses-sdk android:minSdkVersion="17" android:targetSdkVersion="21" />
 
 
 	<uses-feature android:name="android.hardware.wifi" android:required="false"/>

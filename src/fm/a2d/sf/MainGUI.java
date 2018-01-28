@@ -413,7 +413,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		}
 
 		// If daemon not running
-		if (!com_uti.file_get("/dev/s2d_running")) {
+		if (!com_uti.isFileExists("/dev/s2d_running")) {
 			mActivity.showDialog(DAEMON_START_DIALOG);                       // Show the Start dialog
 		}
 

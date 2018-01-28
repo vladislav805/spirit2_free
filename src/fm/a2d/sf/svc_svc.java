@@ -696,7 +696,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     if (new_audio_state.equals ("Start")) {                             // If new audio state = Start...
       //service_update_send ();                                         // Update GUI/Widget/Remote/Notification with latest data
 
-      if (m_com_api.chass_plug_aud.equals ("QCV")) // && com_uti.om8_get ())    // !!!!!! remove om8_get for similar devices (LG G3 ?)
+      if (m_com_api.chass_plug_aud.equals ("QCV")) // && com_uti.isOM8 ())    // !!!!!! remove isOM8 for similar devices (LG G3 ?)
         com_uti.ms_sleep (200);                                         // Otherwise M8 gets pop at start; 100 ms not enough
 
       com_uti.daemon_set ("tuner_mute", "Unmute");                      // Finally unmute tuner audio now that audio start has completed (!! ensure digital output does not require unmute earlier !)
@@ -1012,12 +1012,12 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
         // Check:
     int ret = 0;
 
-      if (! com_uti.access_get (add_full_filename, false, false, true)) { // rwX
+      if (! com_uti.hasAccessFile(add_full_filename, false, false, true)) { // rwX
         com_uti.loge ("error unexecutable addon.d script 99-spirit.sh");
         ret ++;
       }
 // !!!!!! OM7 GPE does not have addon.d so shim is not updated
-      if (ret == 0 && com_uti.file_get ("/system/addon.d/99-spirit.sh") && com_uti.file_size_get ("/system/addon.d/99-spirit.sh") != com_uti.file_size_get ("/data/data/fm.a2d.sf/files/99-spirit.sh")) {
+      if (ret == 0 && com_uti.isFileExists("/system/addon.d/99-spirit.sh") && com_uti.file_size_get ("/system/addon.d/99-spirit.sh") != com_uti.file_size_get ("/data/data/fm.a2d.sf/files/99-spirit.sh")) {
 
         com_uti.logw ("Installing new shim files: Turn BT off");
 
@@ -1028,11 +1028,11 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
         cmd += ("mount -o remount,rw /system ; ");
         cmd += ("cp /data/data/fm.a2d.sf/files/99-spirit.sh /system/addon.d/99-spirit.sh ; ");
         cmd += ("chmod 755 /system/addon.d/99-spirit.sh ; ");
-        if (com_uti.file_get ("/system/lib/libbt-hci.so") && com_uti.file_get ("/system/lib/libbt-hcio.so")) {                // Favor old style
+        if (com_uti.isFileExists("/system/lib/libbt-hci.so") && com_uti.isFileExists("/system/lib/libbt-hcio.so")) {                // Favor old style
           cmd += ("cp /data/data/fm.a2d.sf/lib/libbt-hci.so /system/lib/libbt-hci.so ; ");
           cmd += ("chmod 644 /system/lib/libbt-hci.so ; ");
         }
-        else if (com_uti.file_get ("/system/vendor/lib/libbt-vendor.so") && com_uti.file_get ("/system/vendor/lib/libbt-vendoro.so")) {
+        else if (com_uti.isFileExists("/system/vendor/lib/libbt-vendor.so") && com_uti.isFileExists("/system/vendor/lib/libbt-vendoro.so")) {
           cmd += ("cp /data/data/fm.a2d.sf/lib/libbt-vendor.so /system/vendor/lib/libbt-vendor.so ; ");
           cmd += ("chmod 644 /system/vendor/lib/libbt-vendor.so ; ");
         }
@@ -1040,7 +1040,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
         com_uti.sys_run (cmd, true);
         com_uti.logd ("Done Installing new shim files");
       }
-      else if (ret == 0 && (com_uti.file_get (com_uti.platform_orig) || com_uti.platform_file_entirely_ours ())) { // Use platform_file_entirely_ours () in case ROM adds later
+      else if (ret == 0 && (com_uti.isFileExists(com_uti.platform_orig) || com_uti.platform_file_entirely_ours ())) { // Use platform_file_entirely_ours () in case ROM adds later
         String cmd = "";
         cmd += ("mount -o remount,rw /system ; ");
         cmd += ("cp /data/data/fm.a2d.sf/files/99-spirit.sh /system/addon.d/99-spirit.sh ; ");
@@ -1051,11 +1051,11 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
       }
 
 /*
-      if (! com_uti.access_get (bb1_full_filename, true, false, false)) { // Rwx
+      if (! com_uti.hasAccessFile (bb1_full_filename, true, false, false)) { // Rwx
         com_uti.loge ("error inaccessible bb1 file");
         ret ++;
       }
-      if (! com_uti.access_get (bb2_full_filename, true, false, false)) { // Rwx
+      if (! com_uti.hasAccessFile (bb2_full_filename, true, false, false)) { // Rwx
         com_uti.loge ("error inaccessible bb2 file");
         ret ++;
       }

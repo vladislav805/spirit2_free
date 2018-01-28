@@ -60,5 +60,5 @@ then
 	adb install -r bin/$PROJ-release.apk
 	printf $' OK\nLaunching...'
 	adb shell am start -n fm.a2d.sf/fm.a2d.sf.MainActivity
-	printf $' OK'
+	printf $' OK\n'
 fi
