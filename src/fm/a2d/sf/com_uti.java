@@ -1119,7 +1119,7 @@ Evo 4G LTE  jewel
       com_uti.loge ("UNK fix -> chass_plug_aud: " + com_uti.chass_plug_aud);
     }
     com_uti.logd ("Auto-Detected chass_plug_aud: " + com_uti.chass_plug_aud);
-    //if (com_uti.chass_plug_aud.equals ("UNK"))    DISABLED: because gui_gui needs to know if device unknown.
+    //if (com_uti.chass_plug_aud.equals ("UNK"))    DISABLED: because MainGUI needs to know if device unknown.
     //  com_uti.chass_plug_aud = "CUS";
 
     if (s2_tx_apk () && ! com_uti.chass_plug_aud.equals ("QCV")) {

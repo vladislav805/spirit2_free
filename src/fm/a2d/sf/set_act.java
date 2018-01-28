@@ -1,11 +1,7 @@
 
 package fm.a2d.sf;
 
-import android.content.Intent;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -16,7 +12,6 @@ import android.preference.PreferenceActivity;
 import android.preference.ListPreference;
 import android.text.method.DigitsKeyListener;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.util.Locale;
 
@@ -32,13 +27,13 @@ public class set_act extends PreferenceActivity implements OnSharedPreferenceCha
   private Context m_context = null;
 
   private com_api com_api_get (Context context) {
-    if (gui_act.m_com_api == null) {
-      gui_act.m_com_api = new com_api (context);                      // !! Operates in same process as gui_act !!
-      com_uti.logd ("gui_act.m_com_api: " + gui_act.m_com_api);
+    if (MainActivity.m_com_api == null) {
+      MainActivity.m_com_api = new com_api (context);                      // !! Operates in same process as MainActivity !!
+      com_uti.logd ("MainActivity.m_com_api: " + MainActivity.m_com_api);
     }
-    if (gui_act.m_com_api == null)
-      com_uti.loge ("gui_act.m_com_api == null");
-    return (gui_act.m_com_api);
+    if (MainActivity.m_com_api == null)
+      com_uti.loge ("MainActivity.m_com_api == null");
+    return (MainActivity.m_com_api);
   }
 
     // Lifecycle:
@@ -214,25 +209,25 @@ public class set_act extends PreferenceActivity implements OnSharedPreferenceCha
     if (lo_key.startsWith ("gui"))
       com_uti.logd ("ignore gui key");
     else
-      gui_act.m_com_api.key_set (key, val);
+      MainActivity.m_com_api.key_set (key, val);
 
 /*
     if (key.equals ("audio_output"))
-      gui_act.m_com_api.key_set ("audio_output", val);
+      MainActivity.m_com_api.key_set ("audio_output", val);
     else if (key.equals ("audio_stereo"))
-      gui_act.m_com_api.key_set ("audio_stereo", val);
+      MainActivity.m_com_api.key_set ("audio_stereo", val);
     else if (key.equals ("tuner_band"))
-      gui_act.m_com_api.key_set ("tuner_band", val);
+      MainActivity.m_com_api.key_set ("tuner_band", val);
     else if (key.equals ("tuner_stereo"))
-      gui_act.m_com_api.key_set ("tuner_stereo", val);
+      MainActivity.m_com_api.key_set ("tuner_stereo", val);
     else if (key.equals ("tuner_rds_state"))
-      gui_act.m_com_api.key_set ("tuner_rds_state", val);
+      MainActivity.m_com_api.key_set ("tuner_rds_state", val);
     else if (key.equals ("tuner_rds_af_state"))
-      gui_act.m_com_api.key_set ("tuner_rds_af_state", val);
+      MainActivity.m_com_api.key_set ("tuner_rds_af_state", val);
     //else if (key.equals ("tuner_"))
-    //  gui_act.m_com_api.key_set ("tuner_", val);
+    //  MainActivity.m_com_api.key_set ("tuner_", val);
     else if (key.equals ("audio_digital_amp"))
-      gui_act.m_com_api.key_set ("audio_digital_amp", val);
+      MainActivity.m_com_api.key_set ("audio_digital_amp", val);
 */
 
 /*

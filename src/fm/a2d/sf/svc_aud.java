@@ -3,44 +3,21 @@
 
 package fm.a2d.sf;
 
-import android.media.AudioAttributes;
-import android.media.AudioAttributes.Builder;
 import android.media.AudioFormat;
 //import android.media.AudioFormat.Builder;
 
-import android.app.Service;
 import android.media.MediaRecorder;
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Build.VERSION_CODES;
-import android.os.Environment;
-import android.os.PowerManager;
-import android.provider.Settings;
-import android.provider.Settings.System;
-
-import java.lang.reflect.Method;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.RandomAccessFile;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Locale;
 
 
-public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener {
+	public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener {
 
   private static int    m_obinits = 1;
 
@@ -350,8 +327,8 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
         audiotrack_sessid_int = 0;                                           // Set session ID to 0 (No audio session currently active)
       }
     }
-    m_com_api.audio_sessid = "" + audiotrack_sessid_int;
-    return (m_com_api.audio_sessid);                                    // Return session ID
+    m_com_api.audioSessionId = "" + audiotrack_sessid_int;
+    return (m_com_api.audioSessionId);                                    // Return session ID
   }
 
 

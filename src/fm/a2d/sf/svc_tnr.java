@@ -361,10 +361,10 @@ public class svc_tnr implements svc_tap {
 
                 // Not fully working yet: ?
               if (com_uti.s2_tx_apk () && m_com_api.tuner_mode.equals ("Transmit")) {   // If Transmit APK and TX mode...
-                //com_uti.daemon_set ("tuner_rds_pi", "" + com_uti.prefs_get (m_context, "tuner_rds_pi", 34357));
-                //com_uti.daemon_set ("tuner_rds_pt", "" + com_uti.prefs_get (m_context, "tuner_rds_pt", 9));
-                //com_uti.daemon_set ("tuner_rds_ps",      com_uti.prefs_get (m_context, "tuner_rds_ps", "SpiritTX"));//"Spirit Transmit Program Service"));
-                //com_uti.daemon_set ("tuner_rds_rt",      com_uti.prefs_get (m_context, "tuner_rds_rt", "Radiotext"));//"Spirit Transmit RadioText.......................................56789012345678901234567890123456789012345678901234567890123456701234567890abcdef"));
+                //com_uti.daemon_set ("tuner_rds_pi", "" + com_uti.prefs_get (mContext, "tuner_rds_pi", 34357));
+                //com_uti.daemon_set ("tuner_rds_pt", "" + com_uti.prefs_get (mContext, "tuner_rds_pt", 9));
+                //com_uti.daemon_set ("tuner_rds_ps",      com_uti.prefs_get (mContext, "tuner_rds_ps", "SpiritTX"));//"Spirit Transmit Program Service"));
+                //com_uti.daemon_set ("tuner_rds_rt",      com_uti.prefs_get (mContext, "tuner_rds_rt", "Radiotext"));//"Spirit Transmit RadioText.......................................56789012345678901234567890123456789012345678901234567890123456701234567890abcdef"));
 
                 need_tx_rds_init = true;    // Need to delay this in order to work... How much ?
               }

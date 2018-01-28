@@ -4,30 +4,17 @@
 package fm.a2d.sf;
 
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
-import android.media.RemoteControlClient;
 import android.net.wifi.WifiManager;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.widget.Toast;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileOutputStream;
-import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -430,7 +417,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     val = extras.getString ("audio_digital_amp", "");
     if (! val.equals ("")) {
       m_svc_aap.audio_digital_amp_set ();//val);
-      //com_uti.prefs_set (m_context, "audio_digital_amp", m_com_api.audio_digital_amp);
+      //com_uti.prefs_set (mContext, "audio_digital_amp", m_com_api.audio_digital_amp);
     }
 
     val = extras.getString ("audio_output", "");
@@ -574,7 +561,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     intent.putExtra ("audio_output",       m_com_api.audio_output);
     intent.putExtra ("audio_stereo",       m_com_api.audio_stereo);
     intent.putExtra ("audio_record_state", m_com_api.audio_record_state);
-    intent.putExtra ("audio_sessid",       m_com_api.audio_sessid);
+    intent.putExtra ("audioSessionId",       m_com_api.audioSessionId);
                                                                         // Send tuner data
     if (m_svc_tap == null)
       intent.putExtra ("tuner_state",      "Stop");
@@ -1017,9 +1004,9 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
   private int files_init () {
     com_uti.logd ("starting...");
 
-    //String wav_full_filename = com_uti.res_file_create (m_context, R.raw.s_wav,    "s.wav",         false);             // Not executable
-    //String bb1_full_filename = com_uti.res_file_create (m_context, R.raw.b1_bin,     "b1.bin",        false);             // Not executable
-    //String bb2_full_filename = com_uti.res_file_create (m_context, R.raw.b2_bin,     "b2.bin",        false);             // Not executable
+    //String wav_full_filename = com_uti.res_file_create (mContext, R.raw.s_wav,    "s.wav",         false);             // Not executable
+    //String bb1_full_filename = com_uti.res_file_create (mContext, R.raw.b1_bin,     "b1.bin",        false);             // Not executable
+    //String bb2_full_filename = com_uti.res_file_create (mContext, R.raw.b2_bin,     "b2.bin",        false);             // Not executable
 
     String add_full_filename = com_uti.res_file_create (m_context, R.raw.spirit_sh,  "99-spirit.sh",  true);
         // Check:

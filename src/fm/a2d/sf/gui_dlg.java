@@ -13,7 +13,7 @@ import android.os.Bundle;
 public class gui_dlg { //extends Dialog implements DialogInterface.OnClickListener {
 }
 
-//  Had: public class gui_gui implements gui_gap, gui_dlg.gui_dlg_lstnr {
+//  Had: public class MainGUI implements gui_gap, gui_dlg.gui_dlg_lstnr {
 //       public class gui_dlg extends DialogFragment implements DialogInterface.OnClickListener {
 /*
   private gui_dlg_lstnr listener;
@@ -117,7 +117,7 @@ public class gui_dlg { //extends Dialog implements DialogInterface.OnClickListen
     ft.addToBackStack (null);
 
     if (start) {
-      start_dlg_frag = gui_dlg.init (R.drawable.img_icon_128, m_com_api.service_phase, m_com_api.service_error, null, null, m_context.getString (android.R.string.cancel));//"", m_context.getString (android.R.string.ok), "", null);//"");
+      start_dlg_frag = gui_dlg.init (R.drawable.img_icon_128, m_com_api.service_phase, m_com_api.service_error, null, null, mContext.getString (android.R.string.cancel));//"", mContext.getString (android.R.string.ok), "", null);//"");
       start_dlg_frag.setgui_dlg_lstnr (this);//m_gui_act);
       start_gui_dlg_active = true;
       start_dlg_frag.show (m_gui_act.getFragmentManager (), "start_stop_dialog");
@@ -138,7 +138,7 @@ public class gui_dlg { //extends Dialog implements DialogInterface.OnClickListen
     ft.addToBackStack (null);
 
     if (start) {
-      stop_dlg_frag = gui_dlg.init (android.R.drawable.stat_sys_headset, "Stop", null, null, null, null);//"", m_context.getString (android.R.string.ok), "", null);//"");
+      stop_dlg_frag = gui_dlg.init (android.R.drawable.stat_sys_headset, "Stop", null, null, null, null);//"", mContext.getString (android.R.string.ok), "", null);//"");
       stop_dlg_frag.setgui_dlg_lstnr (this);//m_gui_act);
       stop_gui_dlg_active = true;
       //stop_dlg_frag.show (m_gui_act.getFragmentManager (), "start_stop_dialog");
