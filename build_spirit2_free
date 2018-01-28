@@ -59,6 +59,6 @@ then
 	printf $'Installing apk via adb...'
 	adb install -r bin/$PROJ-release.apk
 	printf $' OK\nLaunching...'
-	adb shell am start -n fm.a2d.sf/fm.a2d.sf.gui_act
+	adb shell am start -n fm.a2d.sf/fm.a2d.sf.MainActivity
 	printf $' OK'
 fi

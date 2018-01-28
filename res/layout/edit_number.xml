@@ -10,7 +10,7 @@
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:scrollHorizontally="true"
-			android:hint = "eg 1079"
+			android:hint="eg 1079"
 			android:singleLine="true"
 			android:inputType="numberDecimal"
 			android:autoText="false"

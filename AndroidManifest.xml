@@ -9,9 +9,7 @@
 Spirit Transmit requires 19 / Kitkat + due to new APIs used in svc_rcc and svc_rcc class itself
 -->
 
-	<uses-sdk
-		android:minSdkVersion="16"
-		android:targetSdkVersion="16" />
+	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="21" />
 
 
 	<uses-feature android:name="android.hardware.wifi" android:required="false"/>
@@ -75,7 +73,7 @@ android:windowSoftInputMode="adjustResize"
 android:windowSoftInputMode="stateHidden"
  -->
 		<activity
-			android:name="fm.a2d.sf.gui_act"
+			android:name="fm.a2d.sf.MainActivity"
 			android:launchMode="singleInstance"
 			android:screenOrientation="portrait" >
 			<intent-filter>
