@@ -223,7 +223,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
 
 // audio_android_smo    // ?? setMode == setPhoneState ???
     if (! (val = extras.getString ("audio_android_smo", "")).equals ("")) {
-      m_AM.setMode (com_uti.int_get (val));
+      m_AM.setMode (com_uti.getInt(val));
       com_uti.logd ("com_uti.setMode: " + m_AM.getMode ());
     }
     if (! (val = extras.getString ("audio_android_gmo", "")).equals (""))
@@ -231,7 +231,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
 
 // audio_android_sso
     if (! (val = extras.getString ("audio_android_sso", "")).equals ("")) {
-      if (com_uti.int_get (val) == 0)
+      if (com_uti.getInt(val) == 0)
         m_AM.setSpeakerphoneOn (false);
       else
         m_AM.setSpeakerphoneOn (true);
@@ -266,30 +266,30 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
 
 // audio_android_sfc
     if (! (val = extras.getString ("audio_android_sfc", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_COMMUNICATION): " + com_uti.setForceUse (com_uti.FOR_COMMUNICATION,       com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_COMMUNICATION): " + com_uti.setForceUse (com_uti.FOR_COMMUNICATION,       com_uti.getInt(val)));
 // audio_android_sfm
     if (! (val = extras.getString ("audio_android_sfm", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_MEDIA): "         + com_uti.setForceUse (com_uti.FOR_MEDIA,               com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_MEDIA): "         + com_uti.setForceUse (com_uti.FOR_MEDIA,               com_uti.getInt(val)));
 // audio_android_sfr
     if (! (val = extras.getString ("audio_android_sfr", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_RECORD): "        + com_uti.setForceUse (com_uti.FOR_RECORD,              com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_RECORD): "        + com_uti.setForceUse (com_uti.FOR_RECORD,              com_uti.getInt(val)));
 // audio_android_sfd
     if (! (val = extras.getString ("audio_android_sfd", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_DOCK): "          + com_uti.setForceUse (com_uti.FOR_DOCK,                com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_DOCK): "          + com_uti.setForceUse (com_uti.FOR_DOCK,                com_uti.getInt(val)));
 // audio_android_sfs
     if (! (val = extras.getString ("audio_android_sfs", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_SYSTEM): "        + com_uti.setForceUse (com_uti.FOR_SYSTEM,              com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_SYSTEM): "        + com_uti.setForceUse (com_uti.FOR_SYSTEM,              com_uti.getInt(val)));
 // audio_android_sfh
     if (! (val = extras.getString ("audio_android_sfh", "")).equals (""))
-      com_uti.logd ("com_uti.setForceUse (FOR_HDMI): "          + com_uti.setForceUse (com_uti.FOR_HDMI_SYSTEM_AUDIO,   com_uti.int_get (val)));
+      com_uti.logd ("com_uti.setForceUse (FOR_HDMI): "          + com_uti.setForceUse (com_uti.FOR_HDMI_SYSTEM_AUDIO,   com_uti.getInt(val)));
 
 
 // audio_android_gdco
     if (! (val = extras.getString ("audio_android_gdco", "")).equals (""))
-      com_uti.logd ("output com_uti.getDeviceConnectionState (): " + com_uti.getDeviceConnectionState (com_uti.int_get (val), ""));
+      com_uti.logd ("output com_uti.getDeviceConnectionState (): " + com_uti.getDeviceConnectionState (com_uti.getInt(val), ""));
 // audio_android_gdci
     if (! (val = extras.getString ("audio_android_gdci", "")).equals (""))
-      com_uti.logd ("input com_uti.getDeviceConnectionState (): " + com_uti.getDeviceConnectionState (com_uti.int_get (val), ""));
+      com_uti.logd ("input com_uti.getDeviceConnectionState (): " + com_uti.getDeviceConnectionState (com_uti.getInt(val), ""));
 // audio_android_argo
     if (! (val = extras.getString ("audio_android_argo", "")).equals (""))
       com_uti.logd ("output com_uti.output_audio_routing_get (): " + com_uti.output_audio_routing_get ());
@@ -301,16 +301,16 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
 
 // audio_android_sduo
     if (! (val = extras.getString ("audio_android_sduo", "")).equals (""))
-      com_uti.logd ("output com_uti.setDeviceConnectionState (UNAVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.int_get (val), com_uti.DEVICE_STATE_UNAVAILABLE, ""));
+      com_uti.logd ("output com_uti.setDeviceConnectionState (UNAVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.getInt(val), com_uti.DEVICE_STATE_UNAVAILABLE, ""));
 // audio_android_sdao
     if (! (val = extras.getString ("audio_android_sdao", "")).equals (""))
-      com_uti.logd ("output com_uti.setDeviceConnectionState (AVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.int_get (val), com_uti.DEVICE_STATE_AVAILABLE, ""));
+      com_uti.logd ("output com_uti.setDeviceConnectionState (AVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.getInt(val), com_uti.DEVICE_STATE_AVAILABLE, ""));
 // audio_android_sdui
     if (! (val = extras.getString ("audio_android_sdui", "")).equals (""))
-      com_uti.logd ("input com_uti.setDeviceConnectionState (UNAVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.int_get (val) | 0x80000000, com_uti.DEVICE_STATE_UNAVAILABLE, ""));
+      com_uti.logd ("input com_uti.setDeviceConnectionState (UNAVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.getInt(val) | 0x80000000, com_uti.DEVICE_STATE_UNAVAILABLE, ""));
 // audio_android_sdai
     if (! (val = extras.getString ("audio_android_sdai", "")).equals (""))
-      com_uti.logd ("input com_uti.setDeviceConnectionState (AVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.int_get (val) | 0x80000000, com_uti.DEVICE_STATE_AVAILABLE, ""));
+      com_uti.logd ("input com_uti.setDeviceConnectionState (AVAILABLE): " + com_uti.setDeviceConnectionState (com_uti.getInt(val) | 0x80000000, com_uti.DEVICE_STATE_AVAILABLE, ""));
 
 
 
@@ -501,7 +501,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
 
     String freq_khz = m_com_api.tuner_freq;
 
-    int ifreq = com_uti.int_get (freq_khz);
+    int ifreq = com_uti.getInt(freq_khz);
 
     //!! ifreq = com_uti.tnru_freq_fix (ifreq + 25);
 
@@ -619,7 +619,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     preset_curr = idx;
     preset_curr_fix ();                                                 // Fix any problems
     String freq = plst_freq [preset_curr];
-    double freq_dou = com_uti.double_get (freq);
+    double freq_dou = com_uti.getDouble(freq);
     int freq_int = (int) (freq_dou * 1000);
     com_uti.logd ("freq: " + freq + "  freq_int: " + freq_int + "  freq_dou: " + freq_dou + "  preset_curr: " + preset_curr + "  preset_num: " + preset_num);
     if (! freq.equals (""))// && freq_int >= com_uti.band_freq_lo && freq_int <= com_uti.band_freq_hi)
@@ -697,7 +697,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
       //service_update_send ();                                         // Update GUI/Widget/Remote/Notification with latest data
 
       if (m_com_api.chass_plug_aud.equals ("QCV")) // && com_uti.isOM8 ())    // !!!!!! remove isOM8 for similar devices (LG G3 ?)
-        com_uti.ms_sleep (200);                                         // Otherwise M8 gets pop at start; 100 ms not enough
+        com_uti.sleep(200);                                         // Otherwise M8 gets pop at start; 100 ms not enough
 
       com_uti.daemon_set ("tuner_mute", "Unmute");                      // Finally unmute tuner audio now that audio start has completed (!! ensure digital output does not require unmute earlier !)
     }
@@ -754,7 +754,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     if (disable_wifi_hack)
       return;
 
-    if (com_uti.bt_get ())
+    if (com_uti.isBluetoothEnabled())
       return;
 
     if (com_uti.android_version <  VERSION_CODES.LOLLIPOP)
@@ -768,7 +768,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
       com_uti.logd ("Wifi IS on");
       wifiManager.setWifiEnabled (false);
       com_uti.logd ("wifiManager.isWifiEnabled (): " + wifiManager.isWifiEnabled ());
-//      com_uti.ms_sleep (1000);
+//      com_uti.sleep (1000);
 //      com_uti.loge ("wifiManager.isWifiEnabled (): " + wifiManager.isWifiEnabled ());
       wifiManager.setWifiEnabled (true);
       com_uti.logd ("wifiManager.isWifiEnabled (): " + wifiManager.isWifiEnabled ());
@@ -1017,7 +1017,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
         ret ++;
       }
 // !!!!!! OM7 GPE does not have addon.d so shim is not updated
-      if (ret == 0 && com_uti.isFileExists("/system/addon.d/99-spirit.sh") && com_uti.file_size_get ("/system/addon.d/99-spirit.sh") != com_uti.file_size_get ("/data/data/fm.a2d.sf/files/99-spirit.sh")) {
+      if (ret == 0 && com_uti.isFileExists("/system/addon.d/99-spirit.sh") && com_uti.getFileSize("/system/addon.d/99-spirit.sh") != com_uti.getFileSize("/data/data/fm.a2d.sf/files/99-spirit.sh")) {
 
         com_uti.logw ("Installing new shim files: Turn BT off");
 
@@ -1037,7 +1037,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
           cmd += ("chmod 644 /system/vendor/lib/libbt-vendor.so ; ");
         }
         cmd += ("mount -o remount,ro /system ; ");
-        com_uti.sys_run (cmd, true);
+        com_uti.runCommand(cmd, true);
         com_uti.logd ("Done Installing new shim files");
       }
       else if (ret == 0 && (com_uti.isFileExists(com_uti.platform_orig) || com_uti.platform_file_entirely_ours ())) { // Use platform_file_entirely_ours () in case ROM adds later
@@ -1046,7 +1046,7 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
         cmd += ("cp /data/data/fm.a2d.sf/files/99-spirit.sh /system/addon.d/99-spirit.sh ; ");
         cmd += ("chmod 755 /system/addon.d/99-spirit.sh ; ");
         cmd += ("mount -o remount,ro /system ; ");
-        com_uti.sys_run (cmd, true);
+        com_uti.runCommand(cmd, true);
         com_uti.logd ("Done Installing addon.d script for /system/etc/audio_platform_info.xml");
       }
 
@@ -1100,22 +1100,22 @@ public class svc_svc extends Service implements svc_tcb, svc_acb {  // Service c
     com_uti.logd ("Start");
 
     m_com_api.tuner_api_mode = "UART";                                  // Default = UART MODE
-    if (com_uti.shim_files_possible_get ()) {                           // If Bluedroid...
+    if (com_uti.isShimFilesPossible()) {                           // If Bluedroid...
       com_uti.logd ("Bluedroid support");
 
-      if (com_uti.shim_files_operational_get () && com_uti.bt_get ()) { // If shim files operational, and BT is on...
+      if (com_uti.isShimFilesOperational() && com_uti.isBluetoothEnabled()) { // If shim files operational, and BT is on...
         com_uti.logd ("Bluedroid shim installed & BT on");
         m_com_api.tuner_api_mode = "SHIM";                              // SHIM MODE
       }
     }
 
     if (m_com_api.tuner_api_mode.equals ("UART")) {
-      if (com_uti.bt_get ()) {
+      if (com_uti.isBluetoothEnabled()) {
         com_uti.logd ("UART mode needed but BT is on; turn BT Off");
         com_uti.bt_set (false, true);                                   // Bluetooth off, and wait for off
         com_uti.rfkill_bt_wait (false);                                 // Wait for BT off
         //com_uti.logd ("Start 4 second delay after BT Off");
-        //com_uti.ms_sleep (4000);                                      // Extra 4 second delay to ensure BT is off !!
+        //com_uti.sleep (4000);                                      // Extra 4 second delay to ensure BT is off !!
         //com_uti.logd ("End 4 second delay after BT Off");
       }
     }

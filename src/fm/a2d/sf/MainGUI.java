@@ -345,7 +345,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		gui_pwr_update(false);
 
 		long curr_time = com_uti.utc_ms_get();
-		long gui_start_first = com_uti.long_get(com_uti.prefs_get(m_context, "gui_start_first", ""));
+		long gui_start_first = com_uti.getLong(com_uti.prefs_get(m_context, "gui_start_first", ""));
 		if (gui_start_first <= 0L) {
 			com_uti.prefs_set(m_context, "gui_start_first", "" + curr_time);
 		}
@@ -402,7 +402,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		m_com_api.chass_plug_tnr = com_uti.chass_plug_tnr_get(m_context);  // Setup Tuner Plugin
 
 		if (gui_start_count <= 1) {// If known device and first 1 runs...
-			String cc = com_uti.country_get(m_context).toUpperCase();
+			String cc = com_uti.getCountry(m_context).toUpperCase();
 			if (cc.equals("US") || cc.equals("CA") || cc.equals("MX")) {   // If USA, Canada or Mexico
 				com_uti.logd("Setting band US");
 				tuner_band_set("US");                                          // Band = US
@@ -622,7 +622,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				if (name != null)
 					m_preset_tv[idx].setText(name);
 				else //if (freq != null && ! freq.equals (""))
-					m_preset_tv[idx].setText("" + ((double) com_uti.int_get(freq)) / 1000);
+					m_preset_tv[idx].setText("" + ((double) com_uti.getInt(freq)) / 1000);
 				m_preset_ib[idx].setImageResource(R.drawable.transparent);
 				//m_preset_ib [idx].setEnabled (false);
 			} else {
@@ -657,7 +657,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 
 	private void eq_start() {
-		int audio_sessid_int = com_uti.int_get(m_com_api.audioSessionId);
+		int audio_sessid_int = com_uti.getInt(m_com_api.audioSessionId);
 		com_uti.logd("audioSessionId: " + m_com_api.audioSessionId + "  audio_sessid_int: " + audio_sessid_int);
 		try {                                                               // Not every phone/ROM has EQ installed, especially stock ROMs
 			Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
@@ -799,12 +799,12 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				return (true);
 /*
       case 5:
-        ret = com_uti.sys_run ("setenforce 1", true);
+        ret = com_uti.runCommand ("setenforce 1", true);
         Toast.makeText (mContext, "setenforce 1 ret: " + ret, Toast.LENGTH_LONG).show ();
         return (true);
       case 6:
         Toast.makeText (mContext, "DISABLING SELINUX IS BAD FOR SECURITY !!!! ; USE FOR TESTING ONLY !!", Toast.LENGTH_LONG).show ();
-        ret = com_uti.sys_run ("setenforce 0", true);
+        ret = com_uti.runCommand ("setenforce 0", true);
         Toast.makeText (mContext, "setenforce 0 ret: " + ret, Toast.LENGTH_LONG).show ();
         return (true);
 */
@@ -849,16 +849,16 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 /*  Code from svc_svc:
       boolean unfriendly_auto_install_and_reboot = false;
       if (unfriendly_auto_install_and_reboot) {
-        if (! com_uti.shim_files_operational_get ()) {                    // If shim files not operational...
-          if (com_uti.bt_get ()) {                                        // July 31, 2014: only install shim if BT is on
+        if (! com_uti.isShimFilesOperational ()) {                    // If shim files not operational...
+          if (com_uti.isBluetoothEnabled ()) {                                        // July 31, 2014: only install shim if BT is on
             com_uti.bt_set (false, true);                                 // Bluetooth off, and wait for off
 
             com_uti.rfkill_bt_wait (false);     // Wait for BT off
             //com_uti.logd ("Start 4 second delay after BT Off");
-            //com_uti.ms_sleep (4000);                                      // Extra 4 second delay to ensure BT is off !!
+            //com_uti.sleep (4000);                                      // Extra 4 second delay to ensure BT is off !!
             //com_uti.logd ("End 4 second delay after BT Off");
 
-            com_uti.shim_install ();                                      // Install shim
+            com_uti.shimInstall ();                                      // Install shim
 
             com_uti.bt_set (true, true);                                  // Bluetooth on, and wait for on  (Need to set BT on so reboot has it on.)
 
@@ -866,7 +866,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
             // Don't need a delay before reboot because BT is on enough to stay on after reboot
             //com_uti.sys_WAS_run ("kill `pidof system_server`", true);
 
-            com_uti.sys_run ("reboot now", true);                         // M7 GPE requires reboot
+            com_uti.runCommand ("reboot now", true);                         // M7 GPE requires reboot
 
             fresh_shim_install = true;
           }
@@ -895,26 +895,26 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 		dlg_bldr.setNeutralButton("Install", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				if (com_uti.shim_files_operational_get()) {
+				if (com_uti.isShimFilesOperational()) {
 					boolean reinstall_destroys_original = true;
 					if (reinstall_destroys_original) {
 						Toast.makeText(m_context, "Shim file already installed. Can't reinstall...", Toast.LENGTH_LONG).show();
 					} else {
 						Toast.makeText(m_context, "Shim file already installed. Reinstalling...", Toast.LENGTH_LONG).show();
-						com_uti.shim_install();
+						com_uti.shimInstall();
 					}
 				} else {
 					Toast.makeText(m_context, "Shim file installing...", Toast.LENGTH_LONG).show();
-					com_uti.shim_install();
+					com_uti.shimInstall();
 				}
 			}
 		});
 
 		dlg_bldr.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				if (com_uti.shim_files_operational_get()) {
+				if (com_uti.isShimFilesOperational()) {
 					Toast.makeText(m_context, "Shim file installed. Removing...", Toast.LENGTH_LONG).show();
-					com_uti.shim_remove();
+					com_uti.shimRemove();
 				} else
 					Toast.makeText(m_context, "Shim file not installed !!!", Toast.LENGTH_LONG).show();
 			}
@@ -958,7 +958,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				Toast.makeText(m_context, "ACDB Fix installing...", Toast.LENGTH_LONG).show();
 
 				m_com_api.key_set("tuner_state", "Stop");
-				com_uti.quiet_ms_sleep(2000);
+				com_uti.silentSleep(2000);
 				com_uti.acdbfix_install(m_context);
 				//}
 			}
@@ -970,7 +970,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				Toast.makeText(m_context, "ACDB Fix installed. Removing...", Toast.LENGTH_LONG).show();
 
 				m_com_api.key_set("tuner_state", "Stop");
-				com_uti.quiet_ms_sleep(2000);
+				com_uti.silentSleep(2000);
 				com_uti.acdbfix_remove(m_context);
         /*}
         else
@@ -1118,7 +1118,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		boolean need_daemon = false;
 		String start_msg = "";
 
-		if (!com_uti.su_installed_get()) {
+		if (!com_uti.isSuInstalled()) {
 			start_msg += "ERROR: NO SuperUser/SuperSU/Root  SpiritF REQUIRES Root.\n\n";
 		} else if (m_com_api.chass_plug_aud.equals("UNK")) {
 			start_msg += "ERROR: Unknown Device. SpiritF REQUIRES International GS1/GS2/GS3/Note/Note2, HTC One, LG G2, Xperia Z+/Qualcomm.\n\n";
@@ -1455,20 +1455,20 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			err_str = "ERROR " + err + " " + svc_phase;
 
 		if (err_str.toLowerCase().contains("daemon")) {
-			com_uti.loge("ERROR Daemon /dev/s2d_running: " + com_uti.quiet_file_get("/dev/s2d_running"));
+			com_uti.loge("ERROR Daemon /dev/s2d_running: " + com_uti.isFileExistSilent("/dev/s2d_running"));
 			daemon_start_dialog_dismiss();
-			//if (! com_uti.quiet_file_get ("/dev/s2d_running"))
+			//if (! com_uti.isFileExistSilent ("/dev/s2d_running"))
 			mActivity.showDialog(DAEMON_ERROR_DIALOG);
 		} else if (err_str.toLowerCase().contains("tuner api")) {
-			com_uti.loge("ERROR Tuner API /dev/s2d_running: " + com_uti.quiet_file_get("/dev/s2d_running"));
+			com_uti.loge("ERROR Tuner API /dev/s2d_running: " + com_uti.isFileExistSilent("/dev/s2d_running"));
 			daemon_start_dialog_dismiss();
 			mActivity.showDialog(TUNER_API_ERROR_DIALOG);
 		} else if (err_str.toLowerCase().contains("tuner")) {
-			com_uti.loge("ERROR Tuner /dev/s2d_running: " + com_uti.quiet_file_get("/dev/s2d_running"));
+			com_uti.loge("ERROR Tuner /dev/s2d_running: " + com_uti.isFileExistSilent("/dev/s2d_running"));
 			daemon_start_dialog_dismiss();
 			mActivity.showDialog(TUNER_ERROR_DIALOG);
 		} else if (err_str.toLowerCase().contains("bluetooth")) {
-			com_uti.loge("ERROR Broadcom Bluetooth /dev/s2d_running: " + com_uti.quiet_file_get("/dev/s2d_running"));
+			com_uti.loge("ERROR Broadcom Bluetooth /dev/s2d_running: " + com_uti.isFileExistSilent("/dev/s2d_running"));
 			daemon_start_dialog_dismiss();
 		}
 
@@ -1497,7 +1497,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		}
 
 		// If daemon is running and daemon start dialog is showing, dismiss dialog
-		if (daemon_start_dialog != null && com_uti.quiet_file_get("/dev/s2d_running")) {
+		if (daemon_start_dialog != null && com_uti.isFileExistSilent("/dev/s2d_running")) {
 			daemon_start_dialog_dismiss();
 		}
 
@@ -1521,7 +1521,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				cdown_timeout_stop();
 				//m_com_api.chass_phtmo = "";   // Prevent future detections
 			} else {
-				int cdown = com_uti.int_get(m_com_api.chass_phtmo);
+				int cdown = com_uti.getInt(m_com_api.chass_phtmo);
 				if (cdown > 0) {
 					com_uti.logd("cdown: " + cdown);
 					cdown_timeout_start(m_com_api.chass_phase, cdown);
@@ -1536,7 +1536,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 		// Audio Session ID:
 
-		int audio_sessid = com_uti.int_get(m_com_api.audioSessionId);
+		int audio_sessid = com_uti.getInt(m_com_api.audioSessionId);
 		if (audio_sessid != 0 && last_audio_sessid_int != audio_sessid) {                        // If audio session ID has changed...
 			last_audio_sessid_int = audio_sessid;
 			com_uti.logd("m_com_api.audioSessionId: " + m_com_api.audioSessionId + "  audioSessionId: " + audio_sessid);
@@ -1572,7 +1572,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		}
 
 		// Frequency:
-		int ifreq = (int) (com_uti.double_get(m_com_api.tuner_freq) * 1000);
+		int ifreq = (int) (com_uti.getDouble(m_com_api.tuner_freq) * 1000);
 		ifreq = com_uti.tnru_freq_fix(ifreq + 25);                       // Must fix due to floating point rounding need, else 106.1 = 106.099
 
 		String freq = null;
@@ -1888,7 +1888,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			m_iv_pwr.setVisibility(View.INVISIBLE);
 			((ImageView) mActivity.findViewById(R.id.frequency_bar)).setVisibility(View.INVISIBLE);
 
-			int audio_sessid = com_uti.int_get(m_com_api.audioSessionId);
+			int audio_sessid = com_uti.getInt(m_com_api.audioSessionId);
 		} else {
 			((LinearLayout) mActivity.findViewById(R.id.vis)).setVisibility(View.INVISIBLE);//GONE);
 
@@ -2003,7 +2003,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			cmd = new_logs_cmd_get();
 		}
 		m_com_api.service_update_send(null, "Writing Debug Log", "20");    // Send Phase Update
-		int ret = com_uti.sys_run(cmd, true);                              // Run "bugreport" and output to file
+		int ret = com_uti.runCommand(cmd, true);                              // Run "bugreport" and output to file
 		m_com_api.service_update_send(null, "Sending Debug Log", "20");    // Send Phase Update
 
 		String subject = "SpiritF " + com_uti.app_version_get(m_context);

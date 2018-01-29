@@ -163,7 +163,7 @@ public class com_api {
 		}
 
 		// Sleep a bit to give receivers a chance to process. Makes debugging with log messages easier regarding order of state changes
-		com_uti.quiet_ms_sleep(10);
+		com_uti.silentSleep(10);
 
 		return (intent);
 	}

@@ -29,7 +29,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "DanglingJavadoc", "ConstantConditions", "JavaDoc"})
 public final class com_uti {
 
 	// Stats:
@@ -58,7 +58,7 @@ public final class com_uti {
 	// Device support:
 
 	public com_uti() { // Default constructor
-		final String tag = tag_prefix_get() + "comuti";
+		final String tag = getTagPrefix() + "comuti";
 		m_obinits++;
 		Log.d(tag, "m_obinits: " + m_obinits);
 
@@ -91,7 +91,7 @@ public final class com_uti {
 	private static String tag_prefix = "";
 	private static final int max_log_char = 7;//8;
 
-	private static String tag_prefix_get() {
+	private static String getTagPrefix() {
 		try {
 			if (tag_prefix != null && !tag_prefix.equals(""))
 				return (tag_prefix);
@@ -111,7 +111,6 @@ public final class com_uti {
 	private static void log(int level, String text) {
 
 		final StackTraceElement stack_trace_el = new Exception().getStackTrace()[2];
-		//final StackTraceElement   stack_trace_el2 = new Exception ().getStackTrace () [3];
 		String tag = stack_trace_el.getFileName().substring(0, max_log_char);
 
 		int idx = tag.indexOf(".");
@@ -120,9 +119,8 @@ public final class com_uti {
 		int index = 3;
 		String tag2 = tag.substring(0, index) + tag.substring(index + 1);
 		String method = stack_trace_el.getMethodName();
-		//String method2 = stack_trace_el2.getMethodName ();
 
-		String full_tag = tag_prefix_get() + tag2;
+		String full_tag = getTagPrefix() + tag2;
 		String full_txt = method + ": " + text;
 
 		if (level == Log.ERROR)
@@ -158,35 +156,30 @@ public final class com_uti {
 
 	//
 
-	public static String country_get(Context context) {
+	public static String getCountry(Context context) {
+		String cc = "DE"; // "CA"; // Canada
+		/**
+		 * getSubscriberId() function Returns the unique subscriber ID, for example, the IMSI for a GSM phone.
+		 * @see http://developer.samsung.com/android/technical-docs/How-to-retrieve-the-Device-Unique-ID-from-android-device
+ 		 */
+		TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
-		String cc = "DE";//"CA";   // Canada
-		// getSubscriberId() function Returns the unique subscriber ID, for example, the IMSI for a GSM phone.
-		//http://developer.samsung.com/android/technical-docs/How-to-retrieve-the-Device-Unique-ID-from-android-device
-		TelephonyManager mngr = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-
-		//String number = ""
-		//if (mngr.getLine1Number () != null)
-		//  number = mngr.getLine1Number ();
-
-		String nci = mngr.getNetworkCountryIso();
-		String sci = mngr.getSimCountryIso();
-		if (nci != null && !nci.equals(""))
+		String nci = manager.getNetworkCountryIso();
+		String sci = manager.getSimCountryIso();
+		if (nci != null && !nci.equals("")) {
 			cc = nci;
-		else if (sci != null && !sci.equals(""))
+		} else if (sci != null && !sci.equals("")) {
 			cc = sci;
+		}
 
 		com_uti.logd("cc: " + cc);
-		return (cc);
+		return cc;
 	}
 
-	public static boolean main_thread_get(String source) {
-		boolean ret = (Looper.myLooper() == Looper.getMainLooper());
-		if (ret)
+	public static void isMainThread(String source) {
+		if (Looper.myLooper() == Looper.getMainLooper()) {
 			com_uti.logd("YES MAIN THREAD source: " + source);
-		//else
-		//  com_uti.logd ("Not main thread source: " + source);
-		return (ret);
+		}
 	}
 
 	//public static boolean strict_mode = false;
@@ -198,7 +191,6 @@ public final class com_uti {
 			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 					.permitAll()
 					.build());
-
 			return;
 		}
 
@@ -206,7 +198,7 @@ public final class com_uti {
 				.detectDiskReads()
 				.detectDiskWrites()
 				.detectNetwork()
-				.detectAll()                                                     // For all detectable problems
+				.detectAll() // For all detectable problems
 				.penaltyLog()
 				.build());
 
@@ -220,120 +212,101 @@ public final class com_uti {
 	}
 
 
-	// The API for Integer.valueOf(String) says the String is interpreted exactly as if it were given to Integer.parseInt(String).
-	// However, valueOf(String) returns a new Integer() object whereas parseInt(String) returns a primitive int.
+	/**
+	 * The API for Integer.valueOf(String) says the String is interpreted exactly as if it were given to Integer.parseInt(String).
+	 * However, valueOf(String) returns a new Integer() object whereas parseInt(String) returns a primitive int.
+	 */
 
-	public static boolean boolean_get(String str) {
-		try {
-			return (Boolean.parseBoolean(str));
-		} catch (Exception e) {
-		}
-		return (false);
+	public static long getLong(String val) {
+		return (getLong(val, 0));
 	}
 
-	public static long long_get(String val) {
-		return (long_get(val, 0));
-	}
-
-	public static long long_get(String val, long def) {
-		//return ((long) double_get (val, def));                            // !!!! This gives nasty rounding errors !!
+	public static long getLong(String val, long def) {
+		//return ((long) getDouble (val, def)); // !!!! This gives nasty rounding errors !!
 		try {
 			if (val == null)
 				return (def);
 			if (val.equals(""))
 				return (def);
-			long lval = Long.parseLong(val);
-			return (lval);
+			return (Long.parseLong(val));
 		} catch (Exception e) {
-			//e.printStackTrace ();
 			loge("Exception e: " + e);
 		}
-		;
-		return (def);
+		return def;
 	}
 
-	public static int int_get(String val) {
-		return (int_get(val, 0));                                          // Get integer, default = 0
+	public static int getInt(String val) {
+		return (getInt(val, 0));                                          // Get integer, default = 0
 	}
 
-	public static int int_get(String val, int def) {
-		//return ((int) double_get (val, def));                             // !!!! This gives nasty rounding errors !!
+	public static int getInt(String val, int def) {
 		try {
-			if (val == null)
-				return (def);
-			if (val.equals(""))
-				return (def);
-			//int ival = Integer.parseInt (val);
-			int ival = (int) Double.parseDouble(val);
-			return (ival);
+			if (val == null || val != null && val.equals("")) {
+				return def;
+			}
+			return (int) Double.parseDouble(val);
 		} catch (Exception e) {
-			//e.printStackTrace ();
 			loge("Exception e: " + e);
 		}
-		;
 		return (def);
 	}
 
-	public static double double_get(String val) {
-		return (double_get(val, 0));
+	public static double getDouble(String val) {
+		return getDouble(val, 0);
 	}
 
-	public static double double_get(String val, double def) {
+	public static double getDouble(String val, double def) {
 		try {
-			if (val == null)
-				return (def);
-			if (val.equals(""))
-				return (def);
-			double dval = Float.parseFloat(val);
-			return (dval);
+			if (val == null || (val != null && val.equals(""))) {
+				return def;
+			}
+			return (double) Float.parseFloat(val);
 		} catch (Exception e) {
 			//e.printStackTrace ();
 			loge("Exception e: " + e);
 		}
-		;
-		return (def);
+
+		return def;
 	}
 
 	// Time:
 
-	public static long quiet_ms_sleep(long ms) {
-		//main_thread_get ("quiet_ms_sleep ms: " + ms);
+	public static void silentSleep(long ms) {
 		try {
-			Thread.sleep(ms);                                                // Wait ms milliseconds
-			return (ms);
-		} catch (InterruptedException e) {
-			return (0);
-		}
+			Thread.sleep(ms); // Wait ms milliseconds
+		} catch (InterruptedException ignored) {}
 	}
 
-	public static long ms_sleep(long ms) {
-		main_thread_get("ms_sleep ms: " + ms);
-
-//    if (ms > 10 && (ms % 101 != 0) && (ms % 11 != 0))
-		com_uti.logw("ms: " + ms);                                       // Warning
-
+	public static long sleep(long ms) {
+		isMainThread("sleep ms: " + ms);
+		com_uti.logw("ms: " + ms); // Warning
 		try {
-			Thread.sleep(ms);                                                // Wait ms milliseconds
-			return (ms);
+			Thread.sleep(ms); // Wait ms milliseconds
+			return ms;
 		} catch (InterruptedException e) {
-			//Thread.currentThread().interrupt();
 			e.printStackTrace();
 			loge("Exception e: " + e);
-			return (0);
+			return 0;
 		}
 	}
 
-	public static long tmr_ms_get() {        // Current timestamp of the most precise timer available on the local system, in nanoseconds. Equivalent to Linux's CLOCK_MONOTONIC.
-		long ms = System.nanoTime() / 1000000; // Should only be used to measure a duration by comparing it against another timestamp on the same device.
-		// Values returned by this method do not have a defined correspondence to wall clock times; the zero value is typically whenever the device last booted
-		//com_uti.logd ("ms: " + ms);           // Changing system time will not affect results.
-		return (ms);
+	// Current timestamp of the most precise timer available on the local system, in nanoseconds. Equivalent to Linux's CLOCK_MONOTONIC.
+	public static long tmr_ms_get() {
+		/**
+		 * Should only be used to measure a duration by comparing it against another timestamp on the same device.
+		 * Values returned by this method do not have a defined correspondence to wall clock times; the zero value is
+		 * typically whenever the device last booted
+		 */
+		return (System.nanoTime() / 1000000);
 	}
 
-	public static long utc_ms_get() {        // Current time in milliseconds since January 1, 1970 00:00:00.0 UTC.
-		long ms = System.currentTimeMillis();  // Always returns UTC times, regardless of the system's time zone. This is often called "Unix time" or "epoch time".
-		//com_uti.logd ("ms: " + ms);           // This method shouldn't be used for measuring timeouts or other elapsed time measurements, as changing the system time can affect the results.
-		return (ms);
+	public static long utc_ms_get() {
+		/**
+		 * Current time in milliseconds since January 1, 1970 00:00:00.0 UTC.
+		 * Always returns UTC times, regardless of the system's time zone. This is often called "Unix time" or "epoch time".
+		 * This method shouldn't be used for measuring timeouts or other elapsed time measurements, as changing the system time can affect the results.
+		 */
+		return (System.currentTimeMillis());
 	}
 
 
@@ -400,8 +373,8 @@ public final class com_uti {
   }
 */
 
-	public static boolean file_delete(final String filename) {
-		main_thread_get("file_delete filename: " + filename);
+	public static void deleteFile(final String filename) {
+		isMainThread("deleteFile filename: " + filename);
 		java.io.File f = null;
 		boolean ret = false;
 		try {
@@ -413,58 +386,44 @@ public final class com_uti {
 			e.printStackTrace();
 		}
 		com_uti.logd("ret: " + ret);
-		return (ret);
 	}
 
-	public static boolean file_create(final String filename) {
-		main_thread_get("file_create filename: " + filename);
-		java.io.File f = null;
-		boolean ret = false;
-		try {
-			f = new File(filename);
-			ret = f.createNewFile();
-			com_uti.logd("ret: " + ret);
-		} catch (Throwable e) {
-			com_uti.logd("Throwable e: " + e);
-			e.printStackTrace();
-		}
-		return (ret);
-	}
-
-	public static void perms_all(final String filename) {
-		main_thread_get("perms_all filename: " + filename);
+	public static void makeAllPermissions(final String filename) {
+		isMainThread("makeAllPermissions filename: " + filename);
 		try {
 			final File file = new File(filename);
 			boolean readable = file.setReadable(true, false);  // r--r--r--
 			boolean writable = file.setWritable(true, false);  // -r--w--w-
 			boolean execable = file.setExecutable(true, false);  // --x--x--x
-			if (readable && writable && execable)
+			if (readable && writable && execable) {
 				logd("filename readable && writable && execable");
-			else
+			} else {
 				loge("filename readable: " + readable + "  writable: " + writable + "  execable: " + execable);
+			}
 		} catch (Throwable e) {
-			//e.printStackTrace ();
 			loge("Throwable e: " + e);
 		}
 	}
 
-	public static String res_file_create(Context context, int id, String filename, boolean exe) {     // When daemon running !!!! java.io.FileNotFoundException: /data/data/com.WHATEVER.fm/files/sprtd (Text file busy)
-		main_thread_get("res_file_create filename: " + filename);
+	// When daemon running !!!! java.io.FileNotFoundException: /data/data/com.WHATEVER.fm/files/sprtd (Text file busy)
+	public static String res_file_create(Context context, int id, String filename, boolean exe) {
+		isMainThread("res_file_create filename: " + filename);
 
-		if (context == null)
-			return ("");
+		if (context == null) {
+			return "";
+		}
 
-		String full_filename = context.getFilesDir() + "/" + filename;
+		String fullFilename = context.getFilesDir() + File.separator + filename;
 		try {
 			InputStream ins = context.getResources().openRawResource(id);          // Open raw resource file as input
 			int size = ins.available();                                      // Get input file size (actually bytes that can be read without indefinite wait)
 
-			if (size > 0 && file_size_get(full_filename) == size) {          // If file already exists and size is unchanged... (assumes size will change on update !!)
+			if (size > 0 && getFileSize(fullFilename) == size) {          // If file already exists and size is unchanged... (assumes size will change on update !!)
 				logd("file exists size unchanged");                            // !! Have to deal with updates !! Could check filesize, assuming filesize always changes.
 				// Could use indicator file w/ version in file name... SSD running problem for update ??
 				// Hypothetically, permissions may not be set for ssd due to sh failure
 
-//!! Disable to re-write all non-EXE w/ same permissions and all EXE w/ permissions 755 !!!!        return (full_filename);                                         // Done
+//!! Disable to re-write all non-EXE w/ same permissions and all EXE w/ permissions 755 !!!!        return (fullFilename);                                         // Done
 
 			}
 
@@ -477,8 +436,8 @@ public final class com_uti {
 			fos.write(buffer);                                               // Copy input to output file
 			fos.close();                                                     // Close output file
 
-			//com_uti.sys_run ("chmod 755 " + full_filename + " 1>/dev/null 2>/dev/null" , false);              // Set execute permission; otherwise rw-rw----
-			perms_all(full_filename);
+			//com_uti.runCommand ("chmod 755 " + fullFilename + " 1>/dev/null 2>/dev/null" , false);              // Set execute permission; otherwise rw-rw----
+			makeAllPermissions(fullFilename);
 
 		} catch (Exception e) {
 			//e.printStackTrace ();
@@ -486,7 +445,7 @@ public final class com_uti {
 			return (null);
 		}
 
-		return (full_filename);
+		return (fullFilename);
 	}
 
 
@@ -517,7 +476,7 @@ public final class com_uti {
 	}
 
 
-	private static void create_file_fix(Context context) {
+	private static void createFileFix() {
 		com_uti.logd("");
 		try {
 			bw.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
@@ -530,12 +489,11 @@ public final class com_uti {
 		} catch (Throwable e) {
 			com_uti.loge("exception: " + e);
 			e.printStackTrace();
-			return;
 		}
 	}
 
 	public static boolean platform_file_entirely_ours() {
-		return (com_uti.file_size_get(com_uti.platform_file) == 187);      // Hard coded !!!!!!!!!!!!!!
+		return (com_uti.getFileSize(com_uti.platform_file) == 187);      // Hard coded !!!!!!!!!!!!!!
 	}
 
 	public static void acdbfix_remove(Context context) {
@@ -545,13 +503,13 @@ public final class com_uti {
 		if (!com_uti.isFileExists(platform_orig)) {
 			com_uti.loge("Original file does not exist platform_orig: " + platform_orig);
 			if (com_uti.platform_file_entirely_ours()) {
-				//boolean bret = com_uti.file_delete (platform_file);
+				//boolean bret = com_uti.deleteFile (platform_file);
 				//com_uti.loge ("!!!!!!!!!! Our file remove bret: : " + bret);
 				cmd += ("rm " + platform_file + " ; ");
 				cmd += ("mount -o remount,ro /system ; ");
 				//cmd += ("killall -hup mediaserver ; ");
 				cmd += ("killall mediaserver ; ");
-				com_uti.sys_run(cmd, true);
+				com_uti.runCommand(cmd, true);
 				com_uti.logd("Done commands");
 			}
 			return;
@@ -561,7 +519,7 @@ public final class com_uti {
 		cmd += ("mount -o remount,ro /system ; ");
 		//cmd += ("killall -hup mediaserver ; ");
 		cmd += ("killall mediaserver ; ");
-		com_uti.sys_run(cmd, true);
+		com_uti.runCommand(cmd, true);
 		com_uti.logd("Done commands");
 	}
 
@@ -579,9 +537,9 @@ public final class com_uti {
 			bw = new java.io.BufferedWriter(new FileWriter(platform_copy), 8192);//512);  // Should never need more than 512 bytes per line
 
 			if (!com_uti.isFileExists(platform_file)) {                         // If there is no audio platform info file...
-				create_file_fix(context);                                      // Create it
+				createFileFix();                                      // Create it
 				bw.close();                                                    // Close output file
-				acdbfix_copy(context);                                         // Copy audio platform info and addon.d script to /system
+				acdbfix_copy();                                         // Copy audio platform info and addon.d script to /system
 
 				com_uti.logd("done");
 				return;
@@ -593,7 +551,7 @@ public final class com_uti {
 				line = br.readLine();
 				if (line == null) {
 					bw.close();                                                  // Close output file
-					acdbfix_copy(context);                                       // Copy audio platform info and addon.d script to /system
+					acdbfix_copy();                                       // Copy audio platform info and addon.d script to /system
 
 					com_uti.logd("done");
 					return;
@@ -608,7 +566,7 @@ public final class com_uti {
 		}
 	}
 
-	private static void acdbfix_copy(Context context) {
+	private static void acdbfix_copy() {
 		com_uti.logd("");
 		String cmd = "";
 		cmd += ("mount -o remount,rw /system ; ");
@@ -624,30 +582,24 @@ public final class com_uti {
 		cmd += ("mount -o remount,ro /system ; ");
 		//cmd += ("killall -hup mediaserver ; ");
 		cmd += ("killall mediaserver ; ");
-		com_uti.sys_run(cmd, true);
+		com_uti.runCommand(cmd, true);
 		com_uti.logd("Done commands");
 	}
 
-	public static boolean su_installed_get() {
-		boolean ret = false;
-		if (com_uti.isFileExists("/system/bin/su"))
-			ret = true;
-		else if (com_uti.isFileExists("/system/xbin/su"))
-			ret = true;
+	public static boolean isSuInstalled() {
+		boolean ret = com_uti.isFileExists("/system/bin/su") || com_uti.isFileExists("/system/xbin/su");
 		com_uti.logd("ret: " + ret);
-		return (ret);
+		return ret;
 	}
 
-	public static int sys_run(String cmd, boolean su) {
-		main_thread_get("sys_run cmd: " + cmd);
-
-		String[] cmds = {("")};
-		cmds[0] = cmd;
-		return (arr_sys_run(cmds, su));
+	public static int runCommand(String cmd, boolean su) {
+		isMainThread("runCommand cmd: " + cmd);
+		return runCommandsArray(new String[]{cmd}, su);
 	}
 
-	private static int arr_sys_run(String[] cmds, boolean su) {         // !! Crash if any output to stderr !!
-		//logd ("sys_run: " + cmds);
+	// !! Crash if any output to stderr !!
+	private static int runCommandsArray(String[] cmds, boolean su) {
+		//logd ("runCommand: " + cmds);
 
 		try {
 			Process p;
@@ -683,7 +635,7 @@ public final class com_uti {
 /*
   public static void rec_sys_run (String [] cmds, boolean su) {             // Array of commands version
     com_uti.logd ("su: " + su + "  cmds: " + cmds);
-    main_thread_get ("rec_sys_run");                                                 // Should not run on main thread, but currently does. Does it matter for service in different process ?
+    isMainThread ("rec_sys_run");                                                 // Should not run on main thread, but currently does. Does it matter for service in different process ?
     try {
       Process p;
       if (su)
@@ -764,14 +716,15 @@ failure to promptly write the input stream or read the output stream of the subp
 */
 
 
-	public static long file_size_get(String filename) {
-		main_thread_get("file_size_get filename: " + filename);
-		File ppFile = null;
+	public static long getFileSize(String filename) {
+		isMainThread("getFileSize filename: " + filename);
+		File ppFile;
 		long ret = -1;
 		try {
 			ppFile = new File(filename);
-			if (ppFile.exists())
+			if (ppFile.exists()) {
 				ret = ppFile.length();
+			}
 		} catch (Exception e) {
 			//e.printStackTrace ();
 		}
@@ -780,7 +733,7 @@ failure to promptly write the input stream or read the output stream of the subp
 	}
 
 	public static boolean isFileExists(String filename, boolean log) {
-		//main_thread_get ("isFileExists filename: " + filename);
+		//isMainThread ("isFileExists filename: " + filename);
 		File ppFile;
 		boolean exists = false;
 		try {
@@ -797,7 +750,7 @@ failure to promptly write the input stream or read the output stream of the subp
 		return (exists);
 	}
 
-	public static boolean quiet_file_get(String filename) {
+	public static boolean isFileExistSilent(String filename) {
 		return (isFileExists(filename, false));
 	}
 
@@ -806,7 +759,7 @@ failure to promptly write the input stream or read the output stream of the subp
 	}
 
 	public static boolean hasAccessFile(String filename, boolean read, boolean write, boolean execute) {
-		main_thread_get("hasAccessFile filename: " + filename);
+		isMainThread("hasAccessFile filename: " + filename);
 		File ppFile = null;
 		boolean exists = false, access = false;
 		try {
@@ -1095,7 +1048,7 @@ Evo 4G LTE  jewel
 	public static int prefs_get(Context context, String key, int def_int) {
 		String def = "" + def_int;
 		String str = prefs_get(context, key, def);
-		int getd = int_get(str);
+		int getd = getInt(str);
 		com_uti.logd("key: " + key + "  def: " + def + "  str: " + str + "  getd: " + getd);
 		return (getd);
 	}
@@ -1605,7 +1558,7 @@ b31:    AUDIO_DEVICE_BIT_IN      = 0x80000000,
 	//
 
 	public static byte[] file_read_16k(String filename) {
-		main_thread_get("file_read_16k filename: " + filename);
+		isMainThread("file_read_16k filename: " + filename);
 		byte[] content = new byte[0];
 		int bufSize = 16384;
 		byte[] content1 = new byte[bufSize];
@@ -1930,7 +1883,7 @@ b31:    AUDIO_DEVICE_BIT_IN      = 0x80000000,
 	// Send byte array to dameon and wait for byte array response:
 
 	private static int do_daemon_cmd(int cmd_len, byte[] cmd_buf, int res_len, byte[] res_buf, int rx_tmo) {
-		//main_thread_get ("do_daemon_cmd cmd: " + cmd);
+		//isMainThread ("do_daemon_cmd cmd: " + cmd);
 
 		String cmd = (com_uti.ba_to_str(cmd_buf)).substring(0, cmd_len);  // Get command as string for logging purposes
 
@@ -1947,7 +1900,7 @@ b31:    AUDIO_DEVICE_BIT_IN      = 0x80000000,
 				return (-999);
 			}
 			com_uti.logw("Waiting for do_daemon_cmd_sem: " + do_daemon_cmd_sem + "  res_len: " + res_len + "  rx_tmo: " + rx_tmo + "  cmd: \"" + cmd + "\"  last_cmd: \"" + last_cmd + "\"");
-			com_uti.quiet_ms_sleep(101);
+			com_uti.silentSleep(101);
 			do_daemon_cmd_sem++;
 		}
 
@@ -2262,7 +2215,7 @@ http://www.netmite.com/android/mydroid/frameworks/base/include/utils/threads.h
 	}
 
 	public static int tnru_khz_get(String freq) {
-		double dfreq = com_uti.double_get(freq);
+		double dfreq = com_uti.getDouble(freq);
 		if (dfreq >= 50000 && dfreq <= 499999)                          // If 50,000 - 499,999  KHz...
 			dfreq *= 1;                                                   // -> Khz
 		else if (dfreq >= 5000 && dfreq <= 49999)                       // If 5,000 - 49,999    x 0.01 MHz...
@@ -2686,86 +2639,58 @@ It should be noted that operation in this region is the same as it is for all RD
 	public static String tnru_rds_ptype_get(String band, int pt) {            // !! English only !!
 		String ret = "";
 		if (band.equals("US"))                                           // If outside North America...
-			ret = tuner_rbds_pt_str_get(pt);
+			ret = getTypeByTunerRBDSCode(pt);
 		else
-			ret = tuner_rds_pt_str_get(pt);
+			ret = getTypeByTunerRDSCode(pt);
 		//com_uti.loge ("band: " + band + "  pt: " + pt + "  ret: " + ret);
 		return (ret);
 	}
 
-	private static String tuner_rbds_pt_str_get(int pt) {                // Get String for RBDS Program type Code (North America)
+	/**
+	 * Get String for RBDS Program type Code (North America)
+	 * @param pt
+	 * @return
+	 */
+	private static String getTypeByTunerRBDSCode(int pt) {
 		switch (pt) {
-			case 0:
-				return "";
-			case 1:
-				return "News";
-			case 2:
-				return "Info";//rmation";
-			case 3:
-				return "Sports";
-			case 4:
-				return "Talk";
-			case 5:
-				return "Rock";
-			case 6:
-				return "Class Rock";//"Classic Rock";
-			case 7:
-				return "Adult Hits";
-			case 8:
-				return "Soft Rock";
-			case 9:
-				return "Top 40";
-			case 10:
-				return "Country";
-			case 11:
-				return "Oldies";
-			case 12:
-				return "Soft";
-			case 13:
-				return "Nostalgia";
-			case 14:
-				return "Jazz";
-			case 15:
-				return "Classical";
-			case 16:
-				return "R & B";//"Rhythm and Blues";
-			case 17:
-				return "Soft R & B";//"Soft Rhythm and Blues";
-			case 18:
-				return "Foreign";// Language";
-			case 19:
-				return "";//"Religious Music";
-			case 20:
-				return "";//"Religious Talk";
-			case 21:
-				return "Personality";
-			case 22:
-				return "Public";
-			case 23:
-				return "College";
+			case 0: return "";
+			case 1: return "News";
+			case 2: return "Info";//rmation";
+			case 3: return "Sports";
+			case 4: return "Talk";
+			case 5: return "Rock";
+			case 6: return "Class Rock";//"Classic Rock";
+			case 7: return "Adult Hits";
+			case 8: return "Soft Rock";
+			case 9: return "Top 40";
+			case 10: return "Country";
+			case 11: return "Oldies";
+			case 12: return "Soft";
+			case 13: return "Nostalgia";
+			case 14: return "Jazz";
+			case 15: return "Classical";
+			case 16: return "R & B";//"Rhythm and Blues";
+			case 17: return "Soft R & B";//"Soft Rhythm and Blues";
+			case 18: return "Foreign";// Language";
+			case 19: return "";//"Religious Music";
+			case 20: return "";//"Religious Talk";
+			case 21: return "Personality";
+			case 22: return "Public";
+			case 23: return "College";
 
 //gap   24  !! Saw 24 in Montreal. Jazz ?
 //""
 //""
 //""
 //""    28
-			case 24:
-				return "Jazz ?";//"Jazz Music";
-			case 25:
-				return "Country";// Music";
-			case 26:
-				return "National";// Music";
-			case 27:
-				return "Oldies";// Music";
-			case 28:
-				return "Folk";// Music";
-
-			case 29:
-				return "Weather";
-			case 30:
-				return "Emerg Test";//"Emergency Test";
-			case 31:
-				return "Emergency";
+			case 24: return "Jazz ?";//"Jazz Music";
+			case 25: return "Country";// Music";
+			case 26: return "National";// Music";
+			case 27: return "Oldies";// Music";
+			case 28: return "Folk";// Music";
+			case 29: return "Weather";
+			case 30: return "Emerg Test";//"Emergency Test";
+			case 31: return "Emergency";
 		}
 		if (pt == -1)
 			com_uti.logd("Unknown RBDS Program Type: " + pt);
@@ -2777,72 +2702,45 @@ It should be noted that operation in this region is the same as it is for all RD
 		return ("");
 	}
 
-	private static String tuner_rds_pt_str_get(int pt) {   // Get the Text String for the RDS Program type Code (Non-North America)
+	/**
+	 * Get the Text String for the RDS Program type Code (Non-North America)
+	 * @param pt
+	 * @return
+	 */
+	private static String getTypeByTunerRDSCode(int pt) {
 		switch (pt) {
-			case 0:
-				return "";
-			case 1:
-				return "News";
-			case 2:
-				return "Cur Affairs";//"Current Affairs";
-			case 3:
-				return "Information";
-			case 4:
-				return "Sport";
-			case 5:
-				return "Education";
-			case 6:
-				return "Drama";
-			case 7:
-				return "Culture";
-			case 8:
-				return "Science";
-			case 9:
-				return "Varied";
-			case 10:
-				return "Pop";// Music";
-			case 11:
-				return "Rock";// Music";
-			case 12:
-				return "Easy Listen";//ing Music";
-			case 13:
-				return "Light Class";//ical";
-			case 14:
-				return "SeriousClass";//"Serious classical";
-			case 15:
-				return "Other";// Music";
-			case 16:
-				return "Weather";
-			case 17:
-				return "Finance";
-			case 18:
-				return "Children";//'s programs";
-			case 19:
-				return "Soc Affairs";//"Social Affairs";
-			case 20:
-				return "Religion";
-			case 21:
-				return "Phone In";
-			case 22:
-				return "Travel";
-			case 23:
-				return "Leisure";
-			case 24:
-				return "Jazz";// Music";
-			case 25:
-				return "Country";// Music";
-			case 26:
-				return "National";// Music";
-			case 27:
-				return "Oldies";// Music";
-			case 28:
-				return "Folk";// Music";
-			case 29:
-				return "Documentary";
-			case 30:
-				return "Emerg Test";//"Emergency Test";
-			case 31:
-				return "Emergency";
+			case 0: return "";
+			case 1: return "News";
+			case 2: return "Cur Affairs";//"Current Affairs";
+			case 3: return "Information";
+			case 4: return "Sport";
+			case 5: return "Education";
+			case 6: return "Drama";
+			case 7: return "Culture";
+			case 8: return "Science";
+			case 9: return "Varied";
+			case 10: return "Pop";// Music";
+			case 11: return "Rock";// Music";
+			case 12: return "Easy Listen";//ing Music";
+			case 13: return "Light Class";//ical";
+			case 14: return "SeriousClass";//"Serious classical";
+			case 15: return "Other";// Music";
+			case 16: return "Weather";
+			case 17: return "Finance";
+			case 18: return "Children";//'s programs";
+			case 19: return "Soc Affairs";//"Social Affairs";
+			case 20: return "Religion";
+			case 21: return "Phone In";
+			case 22: return "Travel";
+			case 23: return "Leisure";
+			case 24: return "Jazz";// Music";
+			case 25: return "Country";// Music";
+			case 26: return "National";// Music";
+			case 27: return "Oldies";// Music";
+			case 28: return "Folk";// Music";
+			case 29: return "Documentary";
+			case 30: return "Emerg Test";//"Emergency Test";
+			case 31: return "Emergency";
 		}
 		if (pt == -1)
 			com_uti.logd("Unknown RDS Program Type: " + pt);
@@ -2857,20 +2755,30 @@ It should be noted that operation in this region is the same as it is for all RD
 
 	// Shim:
 
-	public static boolean shim_files_operational_get() {                                  // If our lib and have old lib to call  (If just large but no old, assume original)
-		if (com_uti.file_size_get("/system/lib/libbt-hci.so") > 60000 && com_uti.file_size_get("/system/lib/libbt-hcio.so") > 10000 && com_uti.file_size_get("/system/lib/libbt-hcio.so") < 60000)
-			return (true);
-		if (com_uti.file_size_get("/system/vendor/lib/libbt-vendor.so") > 60000 && com_uti.file_size_get("/system/vendor/lib/libbt-vendoro.so") > 10000 && com_uti.file_size_get("/system/vendor/lib/libbt-vendoro.so") < 60000)
-			return (true);
-		return (false);
+	/**
+	 * If our lib and have old lib to call (If just large but no old, assume original)
+	 * @return
+	 */
+	public static boolean isShimFilesOperational() {
+		return (
+				(
+						com_uti.getFileSize("/system/lib/libbt-hci.so") > 60000
+								&&
+						com_uti.getFileSize("/system/lib/libbt-hcio.so") > 10000 && com_uti.getFileSize("/system/lib/libbt-hcio.so") < 60000
+				)
+			||
+				(
+						com_uti.getFileSize("/system/vendor/lib/libbt-vendor.so") > 60000
+								&&
+						com_uti.getFileSize("/system/vendor/lib/libbt-vendoro.so") > 10000
+								&&
+						com_uti.getFileSize("/system/vendor/lib/libbt-vendoro.so") < 60000
+				)
+		);
 	}
 
-	public static boolean shim_files_possible_get() {
-		if (com_uti.isFileExists("/system/lib/libbt-hci.so"))
-			return (true);
-		if (com_uti.isFileExists("/system/vendor/lib/libbt-vendor.so"))// && ! chass_plug_aud.equals ("LG2"))   // Disable libbt-vendor for LG2 due to Audio enable issue !!!!
-			return (true);
-		return (false);
+	public static boolean isShimFilesPossible() {
+		return com_uti.isFileExists("/system/lib/libbt-hci.so") || com_uti.isFileExists("/system/vendor/lib/libbt-vendor.so");
 	}
 
 /* OLD: 4 states:
@@ -2879,14 +2787,13 @@ It should be noted that operation in this region is the same as it is for all RD
     BT On &  Shim     Installed & NOT Active                  BT Off, Use UART      Need reboot & BT to be active
     BT On &  Shim     Installed &     Active                          Use SHIM  */
 
-	public static int shim_install() {                                   // XZ2:    Can't remount /system as ro
-		main_thread_get("shim_install");
-		int ret = 0;
-		boolean restart_bt = false;
+	// XZ2: Can't remount /system as ro
+	public static void shimInstall() {
+		isMainThread("shimInstall");
 
 		String cmd = "";
 		cmd += ("mount -o remount,rw /system ; ");
-		if (com_uti.isFileExists("/system/lib/libbt-hci.so")) {                // Favor old style
+		if (com_uti.isFileExists("/system/lib/libbt-hci.so")) { // Favor old style
 			cmd += ("mv /system/lib/libbt-hci.so  /system/lib/libbt-hcio.so ; ");
 			cmd += ("cp /data/data/fm.a2d.sf/lib/libbt-hci.so /system/lib/libbt-hci.so ; ");
 			cmd += ("chmod 644 /system/lib/libbt-hci.so ; ");
@@ -2898,75 +2805,70 @@ It should be noted that operation in this region is the same as it is for all RD
 		cmd += ("cp /data/data/fm.a2d.sf/files/99-spirit.sh /system/addon.d/99-spirit.sh ; ");
 		cmd += ("chmod 755 /system/addon.d/99-spirit.sh ; ");
 		cmd += ("mount -o remount,ro /system ; ");
-		com_uti.sys_run(cmd, true);
+		com_uti.runCommand(cmd, true);
 		com_uti.logd("Done Bluedroid SU commands");
 
-		if (shim_files_operational_get())
+		if (isShimFilesOperational()) {
 			com_uti.logd("Installed SHIM OK");
-		else {
+		} else {
 			com_uti.loge("Install SHIM ERROR");
-			ret = -1;
 		}
 
-		com_uti.sys_run("killall com.android.bluetooth", true);
-
-		return (ret);
+		com_uti.runCommand("killall com.android.bluetooth", true);
 	}
 
-//Doesn't help:
-	//cmd += ("kill `pidof com.android.bluetooth` ; ");                // Kill bluetooth process and it will restart
+	/**
+	 * Doesn't help:
+	 * cmd += ("kill `pidof com.android.bluetooth` ; ");   Kill bluetooth process and it will restart
+	 * cmd += ("pm clear com.android.bluetooth ; ");       Stop bluetooth process; can run even if BT is "off"
+	 * com_uti.runCommand (cmd, true);
+	 * com_uti.sleep (1000);                               Extra 1 second delay to ensure
+	 */
+	public static void shimRemove() {
+		isMainThread("shimRemove");
 
-	//cmd += ("pm clear com.android.bluetooth ; ");                       // Stop bluetooth process; can run even if BT is "off"
-	//com_uti.sys_run (cmd, true);
-	//com_uti.ms_sleep (1000);                                              // Extra 1 second delay to ensure
-
-
-	public static int shim_remove() {
-		main_thread_get("shim_remove");
-		int ret = 0;
-
-		if (!shim_files_operational_get()) {
+		if (!isShimFilesOperational()) {
 			com_uti.loge("Shim file not installed !!");
-//      return (-1);
 		}
 
 		String cmd = "";
 		cmd += ("mount -o remount,rw /system ; ");
 
-		if (com_uti.isFileExists("/system/lib/libbt-hcio.so"))  //shim_files_operational_get ())
+		if (com_uti.isFileExists("/system/lib/libbt-hcio.so")) { //isShimFilesOperational ())
 			cmd += ("mv /system/lib/libbt-hcio.so  /system/lib/libbt-hci.so ; ");
-		else if (!com_uti.isFileExists("/system/lib/libbt-hci.so"))
+		} else if (!com_uti.isFileExists("/system/lib/libbt-hci.so")) {
 			com_uti.logd("No /system/lib/libbt-hci.so installed");
-		else
+		} else {
 			com_uti.loge("No original hci shim file installed !!");
+		}
 
-		if (com_uti.isFileExists("/system/vendor/lib/libbt-vendoro.so"))  //shim_files_operational_get ())
+		if (com_uti.isFileExists("/system/vendor/lib/libbt-vendoro.so")) {  //isShimFilesOperational ())
 			cmd += ("mv /system/vendor/lib/libbt-vendoro.so  /system/vendor/lib/libbt-vendor.so ; ");
-		else if (!com_uti.isFileExists("/system/vendor/lib/libbt-vendor.so"))
+		} else if (!com_uti.isFileExists("/system/vendor/lib/libbt-vendor.so")) {
 			com_uti.logd("No /system/vendor/lib/libbt-vendor.so installed");
-		else
+		} else {
 			com_uti.loge("No original vendor shim file installed !!");
+		}
 
-		if (com_uti.isFileExists("/system/addon.d/99-spirit.sh"))
+		if (com_uti.isFileExists("/system/addon.d/99-spirit.sh")) {
 			cmd += ("rm /system/addon.d/99-spirit.sh ; ");
+		}
+
 		cmd += ("mount -o remount,ro /system ; ");
-		com_uti.sys_run(cmd, true);
+		com_uti.runCommand(cmd, true);
 		com_uti.logd("Done");
 
-		if (!shim_files_operational_get()) {
+		if (!isShimFilesOperational()) {
 			com_uti.logd("Removed SHIM OK");
 		} else {
 			com_uti.loge("Remove SHIM ERROR");
-			ret = -1;
 		}
 
-//com_uti.sys_run ("killall com.android.bluetooth", true);
+		// com_uti.runCommand ("killall com.android.bluetooth", true);
 
-/*
-    //com_uti.loge ("WARM RESTART !!");
-    com_uti.sys_run ("kill `pidof system_server`", true);
-*/
-		return (ret);
+
+		// com_uti.loge ("WARM RESTART !!");
+		// com_uti.runCommand ("kill `pidof system_server`", true);
 	}
 
 /*
@@ -2980,25 +2882,25 @@ private final int getAndIncrement(int modulo) {
 }
 */
 
-	private static BluetoothAdapter m_bt_adapter = null;
+	private static BluetoothAdapter mBluetoothAdapter = null;
 
-	private static boolean bta_get() {
-		m_bt_adapter = BluetoothAdapter.getDefaultAdapter();                // Just do this once, shouldn't change
-		if (m_bt_adapter == null) {
-			com_uti.loge("BluetoothAdapter.getDefaultAdapter () returned null");
-			return (false);
-		}
-		return (true);
+	private static boolean hasBluetoothAdapter() {
+		// Just do this once, shouldn't change
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		return mBluetoothAdapter != null;
 	}
 
-	public static boolean bt_get() {                                     // Old note: Should check with pid_get ("bluetoothd"), "brcm_patchram_plus", "btld", "hciattach" etc. for consistency w/ fm_hrdw
-		boolean ret = false;                                                //      BUT: if isEnabled () doesn't work, m_bt_adapter.enable () and m_bt_adapter.disable () may not work either.
-		if (m_bt_adapter == null)
-			if (!bta_get())
-				return (ret);
-		ret = m_bt_adapter.isEnabled();
-		com_uti.logd("bt_get isEnabled (): " + ret);
-		return (ret);
+	/**
+	 * Old note: Should check with pid_get ("bluetoothd"), "brcm_patchram_plus", "btld", "hciattach" etc. for consistency w/ fm_hrdw
+	 */
+	public static boolean isBluetoothEnabled() {
+		boolean ret = false; // BUT: if isEnabled () doesn't work, mBluetoothAdapter.enable () and mBluetoothAdapter.disable () may not work either.
+		if (mBluetoothAdapter == null && !hasBluetoothAdapter()) {
+			return ret;
+		}
+		ret = mBluetoothAdapter.isEnabled();
+		com_uti.logd("isBluetoothEnabled isEnabled (): " + ret);
+		return ret;
 	}
 
 // bttest is_enabled
@@ -3007,12 +2909,12 @@ private final int getAndIncrement(int modulo) {
 // Alternate/libbluedroid uses rfkill and ctl.stop/ctl.start bluetoothd
 
 	public static int bt_set(boolean bt_pwr, boolean wait) {
-		main_thread_get("bt_set");
-		if (m_bt_adapter == null)
-			if (!bta_get())
+		isMainThread("bt_set");
+		if (mBluetoothAdapter == null)
+			if (!hasBluetoothAdapter())
 				return (-1);
 
-		boolean bt = bt_get();                                             // bt = current BT state
+		boolean bt = isBluetoothEnabled();                                             // bt = current BT state
 		if (bt_pwr && bt) {                                                 // If want BT and have BT...
 			com_uti.logd("bt_set BT already on");
 			return (0);
@@ -3025,16 +2927,16 @@ private final int getAndIncrement(int modulo) {
 			com_uti.logd("bt_set BT turning on");
 
 			try {
-				m_bt_adapter.enable();                                         // Start enable BT
+				mBluetoothAdapter.enable();                                         // Start enable BT
 			} catch (Throwable e) {
-				com_uti.loge("bt_set m_bt_adapter.disable () Exception");
+				com_uti.loge("bt_set mBluetoothAdapter.disable () Exception");
 			}
 
 			if (!wait)                                                       // If no wait
 				return (0);                                                     // Done w/ no error
 
 			bt_wait(true);                                                   // Else wait until BT is on or times out
-			bt = bt_get();
+			bt = isBluetoothEnabled();
 			if (bt) {
 				com_uti.logd("bt_set BT on success");
 				return (0);
@@ -3044,16 +2946,16 @@ private final int getAndIncrement(int modulo) {
 		} else {                                                              // Else if actionable request for BT off
 			com_uti.logd("bt_set BT turning off");
 			try {
-				m_bt_adapter.disable();                                        // Start disable BT
+				mBluetoothAdapter.disable();                                        // Start disable BT
 			} catch (Throwable e) {
-				com_uti.loge("bt_set m_bt_adapter.disable () Exception");
+				com_uti.loge("bt_set mBluetoothAdapter.disable () Exception");
 			}
 
 			if (!wait)                                                       // If no wait
 				return (0);                                                     // Done w/ no error
 
 			bt_wait(false);                                                  // Wait until BT is off or times out
-			bt = bt_get();
+			bt = isBluetoothEnabled();
 			if (!bt) {
 				com_uti.logd("bt_set BT off success");
 				return (0);
@@ -3070,11 +2972,11 @@ private final int getAndIncrement(int modulo) {
 
 		while (!done && ctr++ < 100) {                                   // While not done and 10 seconds has not elapsed...
 			if (wait_on)                                                      // If waiting for BT on...
-				done = bt_get();                                               // Done if BT on
+				done = isBluetoothEnabled();                                               // Done if BT on
 			else                                                              // Else if waiting for BT off...
-				done = !bt_get();                                             // Done if BT off
+				done = !isBluetoothEnabled();                                             // Done if BT off
 			if (!done)
-				com_uti.quiet_ms_sleep(100);                                   // Wait 0.1 second
+				com_uti.silentSleep(100);                                   // Wait 0.1 second
 		}
 		com_uti.logd("wait_on: " + wait_on + "  done: " + done);
 		return;
@@ -3087,23 +2989,14 @@ private final int getAndIncrement(int modulo) {
 
 		while (!done && ctr++ < 100) {                                   // While not done and 10 seconds has not elapsed...
 			if (wait_on)                                                      // If waiting for BT on...
-				done = bt_get();                                               // Done if BT on
+				done = isBluetoothEnabled();                                               // Done if BT on
 			else                                                              // Else if waiting for BT off...
-				done = !bt_get();                                             // Done if BT off
+				done = !isBluetoothEnabled();                                             // Done if BT off
 			if (!done)
-				com_uti.quiet_ms_sleep(100);                                   // Wait 0.1 second
+				com_uti.silentSleep(100);                                   // Wait 0.1 second
 		}
 		com_uti.logd("wait_on: " + wait_on + "  done: " + done);
 		return;
-	}
-
-
-	private static boolean rfkill_bt_get() {
-		String state = rfkill_state_get();
-		if (state.equals("1"))
-			return (true);
-		else
-			return (false);
 	}
 
 	private static String rfkill_state_get() {
@@ -3117,28 +3010,7 @@ private final int getAndIncrement(int modulo) {
 		}
 		return (state);
 	}
-/*
-  private int rfkill_state_set (int state) {
-    com_uti.logd ("state: " + state);
-    if (state != 0) {                                                   // If turning on...
-      //rfkill_state_set_on = true;
-    }
-    else {                                                              // Else if turning off...
-      if (! rfkill_state_set_on)                                        // If was not previously off...
-        return (0);                                                     // Done
-    }
-    rfkill_state_get ();                                                // Display rfkill state
-    String [] cmds = {("")};
-    cmds [0] = ("echo " + state + " > /sys/class/rfkill/rfkill0/state");
-    com_uti.sys_WAS_run (cmds, true);                                         // Set rfkill state WITH SU/Root
-    rfkill_state_get ();                                                // Display rfkill state
-    if (state != 0)                                                     // If turning on...
-      rfkill_state_set_on = true;
-    else
-      rfkill_state_set_on = false;
-    return (0);
-  }
-*/
+
 
 	// Install app:
 /*private void app_install (String filename) {

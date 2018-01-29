@@ -705,7 +705,7 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 					while (thread_pcm_write_active && len_written < len && total_ms_time < 3000) {    // While reading active and not written all and less than 3 seconds total has elapsed...
 						if (total_ms_time >= 0) {                                   // If already looped
 							com_uti.logd("run_pcm_write len_written < len  total_ms_time: " + total_ms_time + "  curr_ms_time: " + curr_ms_time + "  len: " + len + "  new_len: " + new_len + "  len_written: " + len_written + "  aud_buf: " + aud_buf);
-							com_uti.quiet_ms_sleep(30);                              // Wait for about 6 KBytes worth of audio to be de-buffered
+							com_uti.silentSleep(30);                              // Wait for about 6 KBytes worth of audio to be de-buffered
 						}
 						if (!thread_pcm_write_active)
 							break;
@@ -792,10 +792,10 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 					if (bufs >= (aud_buf_num * 3) / 4) {                          // If 75% or more or buffers still in progress (If write thread is getting backed up)
 						//if (thread_pcm_write != null && thread_pcm_write_waiting)
 						//  thread_pcm_write.interrupt ();                            // Wake up thread_pcm_write sooner than usual
-						//com_uti.ms_sleep (300);                                     // Sleep to let write thread process.   0.1s/0.3s = 20/60KBytes @ 48k stereo  (2.5/8 8k buffers)
+						//com_uti.sleep (300);                                     // Sleep to let write thread process.   0.1s/0.3s = 20/60KBytes @ 48k stereo  (2.5/8 8k buffers)
 
 						com_uti.loge("Low on aud_buf");
-						com_uti.ms_sleep(105);//400);//105);
+						com_uti.sleep(105);//400);//105);
 
 						aud_buf_tail = aud_buf_head = 0;                            // Need to Drop all buffers or error will continue...
 						continue;
@@ -824,12 +824,12 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 						}
 // -2: ERROR_BAD_VALUE 
 						com_uti.loge("get error: " + len + "  tail index: " + aud_buf_tail);       //
-						com_uti.ms_sleep(101);//0);                                    // Wait for errors to clear
+						com_uti.sleep(101);//0);                                    // Wait for errors to clear
 /*
 02-04 03:40:55.369 D/s2svcaud(21385): pcm_read_stop: pcm_read_stop thread_pcm_read_active: true
 02-04 03:40:55.369 E/s2svcaud(21385): run: get error: -3  tail index: 5
-02-04 03:40:55.374 E/s2comuti(21385): ms_sleep: ms: 101
-02-04 03:40:55.374 E/s2comuti(21385): ms_sleep: Exception e: java.lang.InterruptedException
+02-04 03:40:55.374 E/s2comuti(21385): sleep: ms: 101
+02-04 03:40:55.374 E/s2comuti(21385): sleep: Exception e: java.lang.InterruptedException
 02-04 03:40:55.374 D/s2svcaud(21385): run: run_pcm_read reads_processed: 2149  writes_processed: 2149  buf_errs: 0  max_bufs: 3
 */
 					} else {                                                        // Else if we have audio data...
@@ -1099,7 +1099,7 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 					com_uti.daemon_set("audio_mode", "Digital");
 
 				if (is_digital_audio_mode() && com_uti.android_version >= 21 && m_com_api.chass_plug_aud.equals("OM7") && com_uti.isFileExists("/system/framework/htcirlibs.jar")) // If HTC One M7 GPE       (Stock Android 5 too ????)
-					com_uti.quiet_ms_sleep(2000);                                // !! Else get microphone 1500 ms not enough sometimes
+					com_uti.silentSleep(2000);                                // !! Else get microphone 1500 ms not enough sometimes
 
 				com_uti.daemon_set("audio_state", "Start");                    // Analog: Enable audio directly to output. Digital: Switch from microphone to FM
 			}
@@ -1308,7 +1308,7 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 		// Without lg2_restart, speaker audio is really messed up   See below at function end; doesn't matter where
 		// sleep happens
 		if (lg2_restart) {
-			com_uti.ms_sleep(3000);                                          // 2500 too small
+			com_uti.sleep(3000);                                          // 2500 too small
 		}
 
 		// If speaker is desired...
@@ -1363,7 +1363,7 @@ public class svc_aud implements svc_aap, AudioManager.OnAudioFocusChangeListener
 		// Without lg2_restart, speaker audio is really messed up
 		// See above at function start; doesn't matter where sleep happens
 		//if (lg2_restart)
-		//	com_uti.ms_sleep (3000);
+		//	com_uti.sleep (3000);
 
 		if (restart_enable) {
 			// Start audio at hardware level based on mode.
@@ -1492,7 +1492,7 @@ REMOTE
 					String arr[] = audio_pseudo_source.split(" ", 2);
 					String src_num = arr[0];
 					if (src_num != null) {
-						src = com_uti.int_get(src_num, src);
+						src = com_uti.getInt(src_num, src);
 					}
 					com_uti.logd("From audio_pseudo_source src: " + src);
 				}

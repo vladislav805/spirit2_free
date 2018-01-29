@@ -168,14 +168,14 @@ import android.content.Context;
     int ctr = 0;
     for (ctr = 0; ctr < max_ctr; ctr ++) {
       if (running) {
-        if (com_uti.quiet_file_get (s2d_running_file))
+        if (com_uti.isFileExistSilent(s2d_running_file))
           break;
       }
       else {
-        if (! com_uti.quiet_file_get (s2d_running_file))
+        if (! com_uti.isFileExistSilent(s2d_running_file))
           break;
       }
-      com_uti.quiet_ms_sleep (sleep_ms);
+      com_uti.silentSleep(sleep_ms);
     }
     if (ctr < max_ctr) {
       com_uti.logd ("Done ctr: " + ctr);
@@ -206,10 +206,10 @@ import android.content.Context;
         m_com_api.tuner_state = "Starting";                             // Starting...
 
         if (com_uti.isFileExists(s2d_running_file)) {                      // If "s2d daemon running" file already exists (if still running or was unexpectedly killed)
-          com_uti.file_delete (s2d_running_file);
+          com_uti.deleteFile(s2d_running_file);
           com_uti.loge ("HAVE s2d_running_file: " + s2d_running_file);
           if (com_uti.isFileExists(s2d_running_file))                      // If we can't delete the "s2d daemon running" file
-            com_uti.loge ("STILL HAVE after file_delete s2d_running_file: " + s2d_running_file);
+            com_uti.loge ("STILL HAVE after deleteFile s2d_running_file: " + s2d_running_file);
         }
         else {
           com_uti.logd ("No s2d_running_file: " + s2d_running_file);
@@ -223,7 +223,7 @@ import android.content.Context;
         cmd_line += "chmod 755 /data/data/fm.a2d.sf/lib/* ;";           // Set permission 755 for all libs
         cmd_line += "cp " + daemon_lib + " " + daemon_exe + " ;";       // Copy lib/lib2sd.so to files/s2d
         cmd_line += "chmod 755 " + daemon_exe + " ;";                   // Set permission 755 for files/s2d
-        ret = com_uti.sys_run (cmd_line, false);
+        ret = com_uti.runCommand(cmd_line, false);
         com_uti.logd ("daemon setup ret: " + ret);
 
 
@@ -234,9 +234,9 @@ import android.content.Context;
         String test2 = "/data/data/fm.a2d.sf/files/test2";
 
         if (com_uti.isFileExists(test1))
-          com_uti.file_delete (test1);
+          com_uti.deleteFile(test1);
         if (com_uti.isFileExists(test2))
-          com_uti.file_delete (test2);
+          com_uti.deleteFile(test2);
 
         if (com_uti.isFileExists(test1))
           com_uti.loge ("Can not delete " + test1);
@@ -245,12 +245,12 @@ import android.content.Context;
 
                                                                         // Start libs2d.so daemon for test in test mode (Not daemon server mode)
         cmd_line = daemon_lib + " test test 1>" + test1 + " 2>" + test2;
-        ret = com_uti.sys_run (cmd_line, false);                        // Start s2d daemon for testing; Don't need SU
+        ret = com_uti.runCommand(cmd_line, false);                        // Start s2d daemon for testing; Don't need SU
         com_uti.logd ("daemon test ret: " + ret);
 
         long size1 = 0;
         if (com_uti.isFileExists(test1)) {
-          size1 = com_uti.file_size_get (test1);
+          size1 = com_uti.getFileSize(test1);
           com_uti.logd ("Have file " + test1 + " size1: " + size1);
           if (size1 > 0) {
             byte [] ba = com_uti.file_read_16k (test1);
@@ -264,7 +264,7 @@ import android.content.Context;
 
         long size2 = 0;
         if (com_uti.isFileExists(test2)) {
-          size2 = com_uti.file_size_get (test2);
+          size2 = com_uti.getFileSize(test2);
           com_uti.logd ("Have file " + test2 + " size2: " + size2);
           if (size2 > 0) {
             byte [] ba = com_uti.file_read_16k (test2);
@@ -286,7 +286,7 @@ import android.content.Context;
 
                                                                         // Start libs2d.so daemon
         cmd_line = daemon_bin + " server_mode_via_argv1 1>/dev/null 2>/dev/null";
-        ret = com_uti.sys_run (cmd_line, true);                         // Start s2d daemon
+        ret = com_uti.runCommand(cmd_line, true);                         // Start s2d daemon
         com_uti.logd ("daemon kill/start ret: " + ret);
 
                                                                         // Wait for daemon to start
@@ -536,7 +536,7 @@ import android.content.Context;
       boolean need_bulk_displays_update = false;
 
         // Freq:
-      new_freq_int = com_uti.int_get (new_freq_str);
+      new_freq_int = com_uti.getInt(new_freq_str);
       if (new_freq_int >= min_freq) {
         if (last_poll_freq != new_freq_int) {
           m_com_api.tuner_freq = new_freq_str;
@@ -547,7 +547,7 @@ import android.content.Context;
       }
 
         // RSSI:
-      if (last_poll_rssi != (last_poll_rssi = com_uti.int_get (m_com_api.tuner_rssi)))
+      if (last_poll_rssi != (last_poll_rssi = com_uti.getInt(m_com_api.tuner_rssi)))
         need_bulk_displays_update = true;//m_svc_tcb.cb_tuner_key ("tuner_rssi", m_com_api.tuner_rssi);                        // Inform change
 
         // Pilot:                                                       // NOT ready for prime-time !
@@ -569,7 +569,7 @@ import android.content.Context;
       }
 
         // RDS pi:
-      new_rds_pi = com_uti.int_get (m_com_api.tuner_rds_pi);
+      new_rds_pi = com_uti.getInt(m_com_api.tuner_rds_pi);
       if (last_poll_rds_pi != new_rds_pi) {
         last_poll_rds_pi = new_rds_pi;
         m_com_api.tuner_rds_picl = com_uti.tnru_rds_picl_get (m_com_api.tuner_band, new_rds_pi);
@@ -577,7 +577,7 @@ import android.content.Context;
       }
 
         // RDS pt:
-      new_rds_pt = com_uti.int_get (m_com_api.tuner_rds_pt);
+      new_rds_pt = com_uti.getInt(m_com_api.tuner_rds_pt);
       if (last_poll_rds_pt != new_rds_pt) {
         last_poll_rds_pt = new_rds_pt;
         m_com_api.tuner_rds_pt = m_com_api.tuner_rds_ptyn = com_uti.tnru_rds_ptype_get (m_com_api.tuner_band, new_rds_pt);
