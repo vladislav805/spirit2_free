@@ -22,11 +22,11 @@ public class MainActivity extends Activity {
 	private static int m_obinits = 0;
 	private static int m_creates = 0;
 
-	private Context mContext = null;
+	private Context mContext;
 	public static com_api m_com_api = null;
 
-	private gui_gap m_gui_gap = null;
-	private static BroadcastReceiver m_gap_bcr = null;
+	private gui_gap mGUI = null;
+	private static BroadcastReceiver mBroadcastReceiver = null;
 
 	// Lifecycle:
 	public MainActivity() { // empty constructor ?
@@ -36,8 +36,8 @@ public class MainActivity extends Activity {
 		mContext = this;
 		com_uti.logd("mContext: " + mContext);
 		com_uti.logd("m_com_api: " + m_com_api);
-		com_uti.logd("m_gap_bcr: " + m_gap_bcr);
-		com_uti.logd("m_gui_gap: " + m_gui_gap);
+		com_uti.logd("mBroadcastReceiver: " + mBroadcastReceiver);
+		com_uti.logd("mGUI: " + mGUI);
 
 		// Disabled due to remaining main thread issues
 		// strict_mode_set(true);
@@ -58,10 +58,10 @@ public class MainActivity extends Activity {
 		mContext = this;
 		com_uti.logd("mContext: " + mContext);
 		com_uti.logd("m_com_api: " + m_com_api);
-		com_uti.logd("m_gap_bcr: " + m_gap_bcr);
-		com_uti.logd("m_gui_gap: " + m_gui_gap);
+		com_uti.logd("mBroadcastReceiver: " + mBroadcastReceiver);
+		com_uti.logd("mGUI: " + mGUI);
 
-		com_uti.logd("SpiritF " + com_uti.app_version_get(mContext));
+		com_uti.logd("SpiritF " + com_uti.getApplicationVersion(mContext));
 
 		com_uti.logd("savedInstanceState: " + savedInstanceState);
 /*
@@ -80,12 +80,12 @@ public class MainActivity extends Activity {
 		// setVolumeControlStream() must be done from an Activity ? Then what stream is used from widget start ?
 		setVolumeControlStream(svc_aud.audio_stream);
 
-		gap_bcr_start(); // Start Common API Broadcast Receiver
+		receiverStart(); // Start Common API Broadcast Receiver
 
 //    m_com_api.chass_plug_aud = com_uti.chass_plug_aud_get (mContext);  // Setup Audio Plugin
 //    m_com_api.chass_plug_tnr = com_uti.chass_plug_tnr_get (mContext);  // Setup Tuner Plugin
 
-		gui_start(); // Start GUI
+		startGUI(); // Start GUI
 	}
 
 	// Create        Start,Resume       Pause,Resume        Pause,Stop,Restart       Start,Resume
@@ -131,8 +131,8 @@ public class MainActivity extends Activity {
 	@Override
 	public void onDestroy() {
 		// One of these caused crashes; added try / catch below
-		gap_bcr_stop();
-		gui_stop();
+		receiverStop();
+		stopGUI();
 
 		com_uti.logd("com_uti.num_daemon_get:              " + com_uti.num_daemon_get);
 		com_uti.logd("com_uti.num_daemon_set:              " + com_uti.num_daemon_set);
@@ -151,60 +151,45 @@ public class MainActivity extends Activity {
 	}
 
 
-	private void gui_stop() {
-		try {
-			if (m_gui_gap == null) {
-				com_uti.loge("already stopped");
-			} else if (!m_gui_gap.gap_state_set("Stop")) {
-				com_uti.loge("gui_stop error"); // Stop UI. If error...
-			} else {
-				com_uti.logd("gui_stop OK");
-			}
-			m_gui_gap = null;
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void gui_start() {
+	private void startGUI() {
 		try {
 			// Instantiate UI
-			m_gui_gap = new MainGUI(mContext, m_com_api);
-			if (m_gui_gap == null) {
-				com_uti.loge("m_gui_gap == null");
-			} else if (!m_gui_gap.gap_state_set("Start")) {                   // Start UI. If error...
-				com_uti.loge("gui_start error");
-				m_gui_gap = null;
+			mGUI = new MainGUI(mContext, m_com_api);
+			if (mGUI == null) {
+				com_uti.loge("mGUI == null");
+			} else if (!mGUI.gap_state_set("Start")) {                   // Start UI. If error...
+				com_uti.loge("startGUI error");
+				mGUI = null;
 			} else {
-				com_uti.logd("gui_start OK");
+				com_uti.logd("startGUI OK");
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 	}
 
-
-	private void gap_bcr_stop() {
-		if (m_gap_bcr != null) {
-			// Remove the State listener
-			if (mContext != null) {
-				try {
-					// Caused by: java.lang.IllegalArgumentException: Receiver not registered: fm.a2d.sf.MainActivity$1@42549158
-					mContext.unregisterReceiver(m_gap_bcr);
-				} catch (Throwable e) {
-					e.printStackTrace();
-				}
+	private void stopGUI() {
+		try {
+			if (mGUI == null) {
+				com_uti.loge("already stopped");
+			} else if (!mGUI.gap_state_set("Stop")) {
+				com_uti.loge("stopGUI error"); // Stop UI. If error...
+			} else {
+				com_uti.logd("stopGUI OK");
 			}
-			m_gap_bcr = null;
+			mGUI = null;
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
 	}
+
 
 	/**
 	 * Common API Intent result & notification Broadcast Receiver
 	 */
-	private void gap_bcr_start() {
-		if (m_gap_bcr == null) {
-			m_gap_bcr = new BroadcastReceiver() {
+	private void receiverStart() {
+		if (mBroadcastReceiver == null) {
+			mBroadcastReceiver = new BroadcastReceiver() {
 				@Override
 				public void onReceive(Context context, Intent intent) {
 					String action = intent.getAction();
@@ -214,49 +199,65 @@ public class MainActivity extends Activity {
 						return;
 					}
 
-					if (m_com_api != null && m_gui_gap != null) {
+					if (m_com_api != null && mGUI != null) {
 						m_com_api.api_service_update(intent);
-						m_gui_gap.gap_service_update(intent);
+						mGUI.gap_service_update(intent);
 					}
 				}
 			};
 
-			IntentFilter intent_filter = new IntentFilter();
-			intent_filter.addAction(com_uti.api_result_id); // Can add more actions if needed
-			intent_filter.addCategory(Intent.CATEGORY_DEFAULT);
+			IntentFilter filter = new IntentFilter();
+			filter.addAction(com_uti.api_result_id); // Can add more actions if needed
+			filter.addCategory(Intent.CATEGORY_DEFAULT);
 
 			Intent last_sticky_state_intent = null;
-			if (mContext != null)
-				last_sticky_state_intent = mContext.registerReceiver(m_gap_bcr, intent_filter, null, null);    // No permission, no handler scheduler thread.
+			if (mContext != null) {
+				// No permission, no handler scheduler thread.
+				last_sticky_state_intent = mContext.registerReceiver(mBroadcastReceiver, filter, null, null);
+			}
 			if (last_sticky_state_intent != null) {
 				com_uti.logd("bcast intent last_sticky_state_intent: " + last_sticky_state_intent);
-				//m_gap_bcr.onReceive (mContext, last_sticky_state_intent);// Like a resend of last audio status update
+				//mBroadcastReceiver.onReceive(mContext, last_sticky_state_intent);// Like a resend of last audio status update
 			}
 		}
+	}
+
+	private void receiverStop() {
+		if (mBroadcastReceiver != null && mContext != null) {
+			// Remove the State listener
+			try {
+				// Caused by: java.lang.IllegalArgumentException: Receiver not registered: fm.a2d.sf.MainActivity$1@42549158
+				mContext.unregisterReceiver(mBroadcastReceiver);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}
+		mBroadcastReceiver = null;
 	}
 
 
 	// Dialog methods:
 
+	// Create a dialog by calling specific *_dialog_create function    ; Triggered by showDialog (int id);
 	@Override
-	protected Dialog onCreateDialog(int id, Bundle args) {               // Create a dialog by calling specific *_dialog_create function    ; Triggered by showDialog (int id);
+	protected Dialog onCreateDialog(int id, Bundle args) {
 		com_uti.logd("id: " + id + "  args: " + args);
 		Dialog dlg_ret = null;
-		if (m_gui_gap != null)
-			dlg_ret = m_gui_gap.gap_dialog_create(id, args);
+		if (mGUI != null)
+			dlg_ret = mGUI.createDialog(id, args);
 		com_uti.logd("dlg_ret: " + dlg_ret);
 		return (dlg_ret);
 	}
 
-
-	public void gap_gui_clicked(View v) {                                // See res/layout/gui_pg2_layout.xml
-		m_gui_gap.gap_gui_clicked(v);
+	// See res/layout/gui_pg2_layout.xml
+	public void onClicked(View v) {
+		mGUI.onClicked(v);
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		return m_gui_gap.gap_menu_create(menu);
+		return mGUI.onMenuCreate(menu);
 	}
 
 	@Override
@@ -271,7 +272,7 @@ public class MainActivity extends Activity {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		m_gui_gap.gap_menu_select(item.getItemId());
+		mGUI.onMenuSelect(item.getItemId());
 		return super.onOptionsItemSelected(item);
 	}
 

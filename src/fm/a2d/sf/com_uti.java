@@ -47,8 +47,8 @@ public final class com_uti {
 	private static boolean loop_set = false;
 
 	// Tuner utilities:
-	public static int band_freq_lo = 87500;
-	public static int band_freq_hi = 108000;
+	public static int bandFrequencyLower = 87500;
+	public static int bandFrequencyHigher = 108000;
 	public static int band_freq_inc = 100;
 	public static int band_freq_odd = 0;
 
@@ -236,7 +236,7 @@ public final class com_uti {
 	}
 
 	public static int getInt(String val) {
-		return (getInt(val, 0));                                          // Get integer, default = 0
+		return getInt(val, 0); // Get integer, default = 0
 	}
 
 	public static int getInt(String val, int def) {
@@ -1013,7 +1013,7 @@ Evo 4G LTE  jewel
 	}
 
 	// Get versionName (from AndroidManifest.xml)
-	public static String app_version_get(Context act) {
+	public static String getApplicationVersion(Context act) {
 		String version = "";
 		PackageInfo package_info;
 		try {
@@ -2171,8 +2171,8 @@ http://www.netmite.com/android/mydroid/frameworks/base/include/utils/threads.h
 
 	public static int tnru_band_set(String band) {
 		com_uti.logd("band: " + band);
-		com_uti.band_freq_lo = 87500;                                      // Actually  87900 for US
-		com_uti.band_freq_hi = 108000;                                      // Actually 107900 for US
+		com_uti.bandFrequencyLower = 87500;                                      // Actually  87900 for US
+		com_uti.bandFrequencyHigher = 108000;                                      // Actually 107900 for US
 		com_uti.band_freq_inc = 100;
 		com_uti.band_freq_odd = 0;
 
@@ -2182,14 +2182,14 @@ http://www.netmite.com/android/mydroid/frameworks/base/include/utils/threads.h
 			com_uti.band_freq_odd = 1;
 		} else if (band.equals("UU")) {
 			if (com_uti.chass_plug_tnr.equals("BCH")) {
-				com_uti.band_freq_lo = 76000;//65000;
-				com_uti.band_freq_hi = 90000;
+				com_uti.bandFrequencyLower = 76000;//65000;
+				com_uti.bandFrequencyHigher = 90000;
 			} else {
-				com_uti.band_freq_lo = 76000;
+				com_uti.bandFrequencyLower = 76000;
 			}
 		}
 
-		com_uti.logd("lo: " + com_uti.band_freq_lo + "  hi: " + com_uti.band_freq_hi + "  inc: " + com_uti.band_freq_inc + "  odd: " + band_freq_odd);
+		com_uti.logd("lo: " + com_uti.bandFrequencyLower + "  hi: " + com_uti.bandFrequencyHigher + "  inc: " + com_uti.band_freq_inc + "  odd: " + band_freq_odd);
 		return (0);
 	}
 
@@ -2250,7 +2250,7 @@ http://www.netmite.com/android/mydroid/frameworks/base/include/utils/threads.h
 		// w/ Odd:   87500- 87699 ->  87500     = Add 100, Divide by 200, then multiply by 200, then subtract 100
 		// w/ Even:  87600- 87799 ->  87600     = Divide by 200, then multiply by 200  (freq_inc)
 
-		//com_uti.logd ("lo: " + com_uti.band_freq_lo + "  hi: " + com_uti.band_freq_hi + "  inc: " + com_uti.band_freq_inc + "  odd: " + com_uti.band_freq_odd);
+		//com_uti.logd ("lo: " + com_uti.bandFrequencyLower + "  hi: " + com_uti.bandFrequencyHigher + "  inc: " + com_uti.band_freq_inc + "  odd: " + com_uti.band_freq_odd);
 
 		if (com_uti.band_freq_odd != 0) {
 			freq += inc / 2;    // 87700
@@ -2267,10 +2267,10 @@ http://www.netmite.com/android/mydroid/frameworks/base/include/utils/threads.h
 	}
 
 	public static int tnru_freq_enforce(int freq) {
-		if (freq < com_uti.band_freq_lo)
-			freq = com_uti.band_freq_hi;
-		if (freq > com_uti.band_freq_hi)
-			freq = com_uti.band_freq_lo;
+		if (freq < com_uti.bandFrequencyLower)
+			freq = com_uti.bandFrequencyHigher;
+		if (freq > com_uti.bandFrequencyHigher)
+			freq = com_uti.bandFrequencyLower;
 		freq = com_uti.tnru_freq_fix(freq);
 		return (freq);
 	}

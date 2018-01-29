@@ -1,6 +1,10 @@
 package fm.a2d.sf;
 
 import android.app.Activity;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
+import android.os.Handler;
+import android.view.View.OnLongClickListener;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
     
@@ -16,7 +20,6 @@ import android.widget.RelativeLayout;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 import android.os.Bundle;
-import android.net.Uri;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -24,7 +27,6 @@ import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.text.TextUtils;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,15 +41,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import java.util.Timer;
 import java.util.ArrayList;
 
+@SuppressWarnings({"DanglingJavadoc", "UnusedAssignment", "unused", "deprecation"})
 public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	private static int m_obinits = 1;
 
 	private Activity mActivity = null;
-	private Context m_context = null;
+	private Context mContext = null;
 	private com_api m_com_api = null;
 
 
@@ -60,7 +62,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private TextView m_tv_svc_phase = null;
 	private TextView m_tv_svc_cdown = null;
 	private TextView m_tv_pilot = null;
-	private TextView m_tv_band = null;
+	private TextView mtvBand = null;
 	private TextView m_tv_freq = null;
 
 	// RDS data:
@@ -76,12 +78,12 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private ImageView m_iv_prev = null;
 	private ImageView m_iv_next = null;
 
-	private ImageView m_iv_paupla = null;
+	private ImageView mivPlayPause = null;
 	private ImageView m_iv_stop = null;
 	private ImageView m_iv_pause = null;
-	private ImageView m_iv_output = null; // ImageView for Speaker/Headset toggle
+	private ImageView mIvOutput = null; // ImageView for Speaker/Headset toggle
 	private ImageView m_iv_volume = null;
-	private ImageView m_iv_record = null;
+	private ImageView mivRecord = null;
 	private ImageView m_iv_menu = null;
 	private ImageView m_iv_pwr = null;
 
@@ -93,14 +95,14 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private RadioButton rb_band_uu = null;
 
 	// Checkboxes:
-	private CheckBox cb_speaker = null;
+	private CheckBox mcbSpeaker = null;
 
 
 	// Presets: 16 = com_api.chass_preset_max
 
 	private int m_presets_curr = 0;
-	private ImageButton[] m_preset_ib = {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};   // 16 Preset Image Buttons
-	private TextView[] m_preset_tv = {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};   // 16 Preset Text Views
+	private ImageButton[] mibPresets = {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};   // 16 Preset Image Buttons
+	private TextView[] mtvPresets = {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null};   // 16 Preset Text Views
 	private String[] m_preset_freq = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};   //  Frequencies
 	private String[] m_preset_name = {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};   //  Names
 
@@ -111,16 +113,16 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 
 	// Dial:
-	private android.os.Handler delay_dial_handler = null;
+	private Handler delay_dial_handler = null;
 	private Runnable delay_dial_runnable = null;
 
-	private gui_dia m_dial = null;
+	private DialView mDial = null;
 	private long last_rotate_time = 0;
 
 	private double freq_at_210 = 85200;
-	private double freq_percent_factor = 251.5;
+	private double freqPercentFactor = 251.5;
 
-	private int last_dial_freq = -1;
+	private int lastFrequency = -1;
 
 	// Color:
 	private int lite_clr = Color.WHITE;
@@ -128,18 +130,18 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private int blue_clr = Color.BLUE;
 
 
-	private Dialog daemon_start_dialog = null;
+	private Dialog mDialogDaemonStart = null;
 	private Dialog daemon_dialog = null;
 
 	private String last_rt = "";
-	private int last_audio_sessid_int = 0;
+	private int lastAudioSessidInt = 0;
 
 
 	// Constructor
 	public MainGUI(Context c, com_api the_com_api) {
 		com_uti.logd("m_obinits: " + m_obinits++);
 
-		m_context = c;
+		mContext = c;
 		mActivity = (Activity) c;
 		m_com_api = the_com_api;
 	}
@@ -222,7 +224,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		mActivity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		pixel_width = dm.widthPixels;
 		pixel_height = dm.heightPixels;
-		pixel_density = m_context.getResources().getDisplayMetrics().density;
+		pixel_density = mContext.getResources().getDisplayMetrics().density;
 		com_uti.logd("pixel_width: " + pixel_width + "  pixel_height: " + pixel_height + "  pixel_density: " + pixel_density);
 
 		mActivity.requestWindowFeature(Window.FEATURE_NO_TITLE);            // No title to save screen space
@@ -258,12 +260,12 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		FrameLayout old_fl_view = (FrameLayout) mActivity.findViewById(R.id.old_fl);
 		old_fl_view.setLayoutParams(frame_layout_params);
 
-		dial_init(); // Initialize frequency disl
+		initDial(); // Initialize frequency disl
 
 		// Set button animation
-		m_ani_button = AnimationUtils.loadAnimation(m_context, R.anim.ani_button);
+		m_ani_button = AnimationUtils.loadAnimation(mContext, R.anim.ani_button);
 
-		m_tv_band = (TextView) mActivity.findViewById(R.id.tv_band);
+		mtvBand = (TextView) mActivity.findViewById(R.id.tv_band);
 		m_tv_pilot = (TextView) mActivity.findViewById(R.id.tv_pilot);
 		m_tv_rssi = (TextView) mActivity.findViewById(R.id.tv_rssi);
 
@@ -293,9 +295,9 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		m_tv_freq = (TextView) mActivity.findViewById(R.id.tv_freq);
 		m_tv_freq.setOnClickListener(short_click_lstnr);
 
-		m_iv_paupla = (ImageView) mActivity.findViewById(R.id.iv_paupla);
-		m_iv_paupla.setOnClickListener(short_click_lstnr);
-		m_iv_paupla.setId(R.id.iv_paupla);
+		mivPlayPause = (ImageView) mActivity.findViewById(R.id.iv_paupla);
+		mivPlayPause.setOnClickListener(short_click_lstnr);
+		mivPlayPause.setId(R.id.iv_paupla);
 
 		m_iv_stop = (ImageView) mActivity.findViewById(R.id.iv_stop);
 		m_iv_stop.setOnClickListener(short_click_lstnr);
@@ -305,18 +307,18 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		m_iv_pause.setOnClickListener(short_click_lstnr);
 		m_iv_pause.setId(R.id.iv_pause);
 
-		m_iv_output = (ImageView) mActivity.findViewById(R.id.iv_output);
-		m_iv_output.setOnClickListener(short_click_lstnr);
-		m_iv_output.setId(R.id.iv_output);
+		mIvOutput = (ImageView) mActivity.findViewById(R.id.iv_output);
+		mIvOutput.setOnClickListener(short_click_lstnr);
+		mIvOutput.setId(R.id.iv_output);
 
 		m_iv_volume = (ImageView) mActivity.findViewById(R.id.iv_volume);
 		m_iv_volume.setOnClickListener(short_click_lstnr);
 		m_iv_volume.setId(R.id.iv_volume);
 
-		m_iv_record = (ImageView) mActivity.findViewById(R.id.iv_record);
-		m_iv_record.setOnClickListener(short_click_lstnr);
-		//m_iv_record.setOnLongClickListener (long_click_lstnr);
-		m_iv_record.setId(R.id.iv_record);
+		mivRecord = (ImageView) mActivity.findViewById(R.id.iv_record);
+		mivRecord.setOnClickListener(short_click_lstnr);
+		//mivRecord.setOnLongClickListener (long_click_lstnr);
+		mivRecord.setId(R.id.iv_record);
 
 		m_iv_menu = (ImageView) mActivity.findViewById(R.id.iv_menu);
 		m_iv_menu.setOnClickListener(short_click_lstnr);
@@ -327,7 +329,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		rb_band_us = (RadioButton) mActivity.findViewById(R.id.rb_band_us);
 		rb_band_uu = (RadioButton) mActivity.findViewById(R.id.rb_band_uu);
 
-		cb_speaker = (CheckBox) mActivity.findViewById(R.id.cb_speaker);
+		mcbSpeaker = (CheckBox) mActivity.findViewById(R.id.cb_speaker);
 
 		try {
 			lite_clr = Color.parseColor("#ffffffff"); // lite like PS
@@ -340,14 +342,14 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		m_tv_rt.setTextColor(lite_clr);
 		m_tv_ps.setTextColor(lite_clr);
 
-		presets_setup(lite_clr);
+		setupPresets(lite_clr);
 
 		gui_pwr_update(false);
 
 		long curr_time = com_uti.utc_ms_get();
-		long gui_start_first = com_uti.getLong(com_uti.prefs_get(m_context, "gui_start_first", ""));
+		long gui_start_first = com_uti.getLong(com_uti.prefs_get(mContext, "gui_start_first", ""));
 		if (gui_start_first <= 0L) {
-			com_uti.prefs_set(m_context, "gui_start_first", "" + curr_time);
+			com_uti.prefs_set(mContext, "gui_start_first", "" + curr_time);
 		}
 
 		// Set preferences defaults:
@@ -390,19 +392,19 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
     com_uti.def_set (mContext, "debug_debug");
 */
 
-		int gui_start_count = com_uti.prefs_get(m_context, "gui_start_count", 0);
+		int gui_start_count = com_uti.prefs_get(mContext, "gui_start_count", 0);
 		gui_start_count++;
-		com_uti.prefs_set(m_context, "gui_start_count", gui_start_count);
+		com_uti.prefs_set(mContext, "gui_start_count", gui_start_count);
 
 		m_rg_band = (RadioGroup) mActivity.findViewById(R.id.rg_band);
 
 		// !! tuner_band_set() is now the first thing that starts svc_svc, if not already started
 
-		m_com_api.chass_plug_aud = com_uti.chass_plug_aud_get(m_context);  // Setup Audio Plugin
-		m_com_api.chass_plug_tnr = com_uti.chass_plug_tnr_get(m_context);  // Setup Tuner Plugin
+		m_com_api.chass_plug_aud = com_uti.chass_plug_aud_get(mContext);  // Setup Audio Plugin
+		m_com_api.chass_plug_tnr = com_uti.chass_plug_tnr_get(mContext);  // Setup Tuner Plugin
 
 		if (gui_start_count <= 1) {// If known device and first 1 runs...
-			String cc = com_uti.getCountry(m_context).toUpperCase();
+			String cc = com_uti.getCountry(mContext).toUpperCase();
 			if (cc.equals("US") || cc.equals("CA") || cc.equals("MX")) {   // If USA, Canada or Mexico
 				com_uti.logd("Setting band US");
 				tuner_band_set("US");                                          // Band = US
@@ -417,24 +419,28 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			mActivity.showDialog(DAEMON_START_DIALOG);                       // Show the Start dialog
 		}
 
-		String band = com_uti.prefs_get(m_context, "tuner_band", "EU");
+		String band = com_uti.prefs_get(mContext, "tuner_band", "EU");
 		//if (! m_com_api.chass_plug_aud.equals ("UNK"))
 		tuner_band_set(band);
-		if (m_com_api.tuner_band.equals("EU")) {
-			rb_band_eu.setChecked(true);
-			rb_band_us.setChecked(false);
-			rb_band_uu.setChecked(false);
-		} else if (m_com_api.tuner_band.equals("US")) {
-			rb_band_eu.setChecked(false);
-			rb_band_us.setChecked(true);
-			rb_band_uu.setChecked(false);
-		} else if (m_com_api.tuner_band.equals("UU")) {
-			rb_band_eu.setChecked(false);
-			rb_band_us.setChecked(false);
-			rb_band_uu.setChecked(true);
+		switch (m_com_api.tuner_band) {
+			case "EU":
+				rb_band_eu.setChecked(true);
+				rb_band_us.setChecked(false);
+				rb_band_uu.setChecked(false);
+				break;
+			case "US":
+				rb_band_eu.setChecked(false);
+				rb_band_us.setChecked(true);
+				rb_band_uu.setChecked(false);
+				break;
+			case "UU":
+				rb_band_eu.setChecked(false);
+				rb_band_us.setChecked(false);
+				rb_band_uu.setChecked(true);
+				break;
 		}
 
-		load_prefs();
+		loadPreferences();
 
 		// If known device and tuner not started...
 		if (!m_com_api.chass_plug_aud.equals("UNK") && !m_com_api.tuner_state.equals("Start")) {
@@ -448,27 +454,30 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	}
 
 
-	private void dial_init() {
+	private void initDial() {
 
 		// Dial Relative Layout:
-		RelativeLayout freq_dial_relative_layout = (RelativeLayout) mActivity.findViewById(R.id.freq_dial);
-		LayoutParams lp_dial = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);   // WRAP_CONTENT
-		//int dial_size = (pixel_width * 3) / 4;
+		RelativeLayout dialWrap = (RelativeLayout) mActivity.findViewById(R.id.freq_dial);
+
+		LayoutParams lpDial = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT); // WRAP_CONTENT
+		lpDial.addRule(RelativeLayout.CENTER_IN_PARENT);
+
 		int dial_size = (pixel_width * 7) / 8;
-		m_dial = new gui_dia(m_context, R.drawable.freq_dial_needle, -1, dial_size, dial_size); // Get dial instance/RelativeLayout view
-		lp_dial.addRule(RelativeLayout.CENTER_IN_PARENT);
-		freq_dial_relative_layout.addView(m_dial, lp_dial);
+		mDial = new DialView(mContext, R.drawable.freq_dial_needle, -1, dial_size, dial_size); // Get dial instance/RelativeLayout view
+
+		dialWrap.addView(mDial, lpDial);
+
 
 		// Dial internal Power Relative Layout:
-		LayoutParams lp_power;
-		lp_power = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		LayoutParams lp_power = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		lp_power.addRule(RelativeLayout.CENTER_IN_PARENT);
 
-		m_iv_pwr = new ImageView(m_context);
+		m_iv_pwr = new ImageView(mContext);
 		m_iv_pwr.setImageResource(R.drawable.dial_power_off);
-		freq_dial_relative_layout.addView(m_iv_pwr, lp_power);
+		dialWrap.addView(m_iv_pwr, lp_power);
 
-		m_dial.listener_set(new gui_dia.gui_dia_listener() {                      // Setup listener for state_chngd() and dial_chngd()
+		// Setup listener for onStateChanged() and onAngleChanged()
+		mDial.setOnDialChangedListener(new DialView.OnDialChangedListener() {
 
 			public boolean prev_go() {
 				if (!m_com_api.tuner_state.equals("Start")) {
@@ -490,7 +499,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				return (true);                                                  // Consumed
 			}
 
-			public boolean state_chngd() {
+			public boolean onStateChanged() {
 				com_uti.logd("via gui_dia m_com_api.audio_state: " + m_com_api.audio_state);
 				if (m_com_api.audio_state.equals("Start"))
 					m_com_api.key_set("tuner_state", "Stop");
@@ -505,163 +514,162 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 					com_uti.logd("via gui_dia abort tuner_state: " + m_com_api.tuner_state);
 					return (false);                                               // Not Consumed
 				}
-				if (last_dial_freq < com_uti.band_freq_lo || last_dial_freq > com_uti.band_freq_hi)
+				if (lastDialFrequency < com_uti.bandFrequencyLower || lastDialFrequency > com_uti.bandFrequencyHigher)
 					return (false);                                               // Not Consumed
-				m_com_api.key_set("tuner_freq", "" + last_dial_freq);
+				m_com_api.key_set("tuner_freq", "" + lastDialFrequency);
 				return (true);                                                  // Consumed
 			}
 
-			private int last_dial_freq = 0;
+			private int lastDialFrequency = 0;
 
-			public boolean dial_chngd(double angle) {
+			public boolean onAngleChanged(double angle) {
 				if (!m_com_api.tuner_state.equals("Start")) {
 					com_uti.logd("via gui_dia abort tuner_state: " + m_com_api.tuner_state);
 					return (false);                                               // Not Consumed
 				}
 				long curr_time = com_uti.tmr_ms_get();
-				int freq = dial_freq_get(angle);
+				int freq = getFrequency(angle);
 				com_uti.logd("via gui_dia angle: " + angle + "  freq: " + freq);
 				freq += 25;
 				freq /= 50;
 				freq *= 50;
-				if (freq < com_uti.band_freq_lo || freq > com_uti.band_freq_hi)
+				if (freq < com_uti.bandFrequencyLower || freq > com_uti.bandFrequencyHigher)
 					return (false);                                               // Not Consumed
 				freq = com_uti.tnru_freq_enforce(freq);
 				com_uti.logd("via gui_dia freq: " + freq + "  curr_time: " + curr_time + "  last_rotate_time: " + last_rotate_time);
-				dial_freq_set(freq);   // !! Better to set fast !!
-				last_dial_freq = freq;
+				setDialFrequency(freq);   // !! Better to set fast !!
+				lastDialFrequency = freq;
 
 				if (delay_dial_handler != null) {
 					if (delay_dial_runnable != null)
 						delay_dial_handler.removeCallbacks(delay_dial_runnable);
 				} else
-					delay_dial_handler = new android.os.Handler();
+					delay_dial_handler = new Handler();
 
 				delay_dial_runnable = new Runnable() {
 					public void run() {
-						m_com_api.key_set("tuner_freq", "" + last_dial_freq);
+						m_com_api.key_set("tuner_freq", "" + lastDialFrequency);
 					}
 				};
 				delay_dial_handler.postDelayed(delay_dial_runnable, 50);
 
-				return (true);                                                  // Consumed
+				return true; // Consumed
 			}
 		});
 	}
 
-	private int dial_freq_get(double angle) {
-		double percent = (angle + 150) / 3;
-		return ((int) (freq_percent_factor * percent + freq_at_210));
+	private int getFrequency(double angle) {
+		return (int) (freqPercentFactor * ((angle + 150) / 3) + freq_at_210);
 	}
 
 
-	private void dial_freq_set(int freq) {
-		if (last_dial_freq == freq)                                         // Optimize
+	private void setDialFrequency(int freq) {
+		// Optimize
+		if (lastFrequency == freq)    {
 			return;
-		if (m_dial == null)
+		}
+		if (mDial == null) {
 			return;
-		last_dial_freq = freq;
-		double percent = (freq - freq_at_210) / freq_percent_factor;
+		}
+		lastFrequency = freq;
+		double percent = (freq - freq_at_210) / freqPercentFactor;
 		double angle = (percent * 3) - 150;
-		m_dial.dial_angle_set(angle);
+		mDial.setAngleDial(angle);
 	}
 
-
-	private void presets_setup(int clr) {                                // 16 Max Preset Buttons hardcoded
+	// 16 Max Preset Buttons hardcoded
+	private void setupPresets(int color) {
 
 		// Textviews:
-		m_preset_tv[0] = (TextView) mActivity.findViewById(R.id.tv_preset_0);
-		m_preset_tv[1] = (TextView) mActivity.findViewById(R.id.tv_preset_1);
-		m_preset_tv[2] = (TextView) mActivity.findViewById(R.id.tv_preset_2);
-		m_preset_tv[3] = (TextView) mActivity.findViewById(R.id.tv_preset_3);
-		m_preset_tv[4] = (TextView) mActivity.findViewById(R.id.tv_preset_4);
-		m_preset_tv[5] = (TextView) mActivity.findViewById(R.id.tv_preset_5);
-		m_preset_tv[6] = (TextView) mActivity.findViewById(R.id.tv_preset_6);
-		m_preset_tv[7] = (TextView) mActivity.findViewById(R.id.tv_preset_7);
-		m_preset_tv[8] = (TextView) mActivity.findViewById(R.id.tv_preset_8);
-		m_preset_tv[9] = (TextView) mActivity.findViewById(R.id.tv_preset_9);
-		m_preset_tv[10] = (TextView) mActivity.findViewById(R.id.tv_preset_10);
-		m_preset_tv[11] = (TextView) mActivity.findViewById(R.id.tv_preset_11);
-		m_preset_tv[12] = (TextView) mActivity.findViewById(R.id.tv_preset_12);
-		m_preset_tv[13] = (TextView) mActivity.findViewById(R.id.tv_preset_13);
-		m_preset_tv[14] = (TextView) mActivity.findViewById(R.id.tv_preset_14);
-		m_preset_tv[15] = (TextView) mActivity.findViewById(R.id.tv_preset_15);
+		mtvPresets[0] = (TextView) mActivity.findViewById(R.id.tv_preset_0);
+		mtvPresets[1] = (TextView) mActivity.findViewById(R.id.tv_preset_1);
+		mtvPresets[2] = (TextView) mActivity.findViewById(R.id.tv_preset_2);
+		mtvPresets[3] = (TextView) mActivity.findViewById(R.id.tv_preset_3);
+		mtvPresets[4] = (TextView) mActivity.findViewById(R.id.tv_preset_4);
+		mtvPresets[5] = (TextView) mActivity.findViewById(R.id.tv_preset_5);
+		mtvPresets[6] = (TextView) mActivity.findViewById(R.id.tv_preset_6);
+		mtvPresets[7] = (TextView) mActivity.findViewById(R.id.tv_preset_7);
+		mtvPresets[8] = (TextView) mActivity.findViewById(R.id.tv_preset_8);
+		mtvPresets[9] = (TextView) mActivity.findViewById(R.id.tv_preset_9);
+		mtvPresets[10] = (TextView) mActivity.findViewById(R.id.tv_preset_10);
+		mtvPresets[11] = (TextView) mActivity.findViewById(R.id.tv_preset_11);
+		mtvPresets[12] = (TextView) mActivity.findViewById(R.id.tv_preset_12);
+		mtvPresets[13] = (TextView) mActivity.findViewById(R.id.tv_preset_13);
+		mtvPresets[14] = (TextView) mActivity.findViewById(R.id.tv_preset_14);
+		mtvPresets[15] = (TextView) mActivity.findViewById(R.id.tv_preset_15);
 
 		// Imagebuttons:
-		m_preset_ib[0] = (ImageButton) mActivity.findViewById(R.id.ib_preset_0);
-		m_preset_ib[1] = (ImageButton) mActivity.findViewById(R.id.ib_preset_1);
-		m_preset_ib[2] = (ImageButton) mActivity.findViewById(R.id.ib_preset_2);
-		m_preset_ib[3] = (ImageButton) mActivity.findViewById(R.id.ib_preset_3);
-		m_preset_ib[4] = (ImageButton) mActivity.findViewById(R.id.ib_preset_4);
-		m_preset_ib[5] = (ImageButton) mActivity.findViewById(R.id.ib_preset_5);
-		m_preset_ib[6] = (ImageButton) mActivity.findViewById(R.id.ib_preset_6);
-		m_preset_ib[7] = (ImageButton) mActivity.findViewById(R.id.ib_preset_7);
-		m_preset_ib[8] = (ImageButton) mActivity.findViewById(R.id.ib_preset_8);
-		m_preset_ib[9] = (ImageButton) mActivity.findViewById(R.id.ib_preset_9);
-		m_preset_ib[10] = (ImageButton) mActivity.findViewById(R.id.ib_preset_10);
-		m_preset_ib[11] = (ImageButton) mActivity.findViewById(R.id.ib_preset_11);
-		m_preset_ib[12] = (ImageButton) mActivity.findViewById(R.id.ib_preset_12);
-		m_preset_ib[13] = (ImageButton) mActivity.findViewById(R.id.ib_preset_13);
-		m_preset_ib[14] = (ImageButton) mActivity.findViewById(R.id.ib_preset_14);
-		m_preset_ib[15] = (ImageButton) mActivity.findViewById(R.id.ib_preset_15);
+		mibPresets[0] = (ImageButton) mActivity.findViewById(R.id.ib_preset_0);
+		mibPresets[1] = (ImageButton) mActivity.findViewById(R.id.ib_preset_1);
+		mibPresets[2] = (ImageButton) mActivity.findViewById(R.id.ib_preset_2);
+		mibPresets[3] = (ImageButton) mActivity.findViewById(R.id.ib_preset_3);
+		mibPresets[4] = (ImageButton) mActivity.findViewById(R.id.ib_preset_4);
+		mibPresets[5] = (ImageButton) mActivity.findViewById(R.id.ib_preset_5);
+		mibPresets[6] = (ImageButton) mActivity.findViewById(R.id.ib_preset_6);
+		mibPresets[7] = (ImageButton) mActivity.findViewById(R.id.ib_preset_7);
+		mibPresets[8] = (ImageButton) mActivity.findViewById(R.id.ib_preset_8);
+		mibPresets[9] = (ImageButton) mActivity.findViewById(R.id.ib_preset_9);
+		mibPresets[10] = (ImageButton) mActivity.findViewById(R.id.ib_preset_10);
+		mibPresets[11] = (ImageButton) mActivity.findViewById(R.id.ib_preset_11);
+		mibPresets[12] = (ImageButton) mActivity.findViewById(R.id.ib_preset_12);
+		mibPresets[13] = (ImageButton) mActivity.findViewById(R.id.ib_preset_13);
+		mibPresets[14] = (ImageButton) mActivity.findViewById(R.id.ib_preset_14);
+		mibPresets[15] = (ImageButton) mActivity.findViewById(R.id.ib_preset_15);
 
-		for (int idx = 0; idx < com_api.chass_preset_max; idx++) {              // For all presets...
-			m_preset_ib[idx].setOnClickListener(preset_select_lstnr);   // Set click listener
-			m_preset_ib[idx].setOnLongClickListener(preset_change_lstnr);   // Set long click listener
+		for (TextView tv : mtvPresets) { // For all presets...
+			tv.setOnClickListener(preset_select_lstnr); // Set click listener
+			tv.setOnLongClickListener(preset_change_lstnr); // Set long click listener
 		}
 
-
-		for (int idx = 0; idx < com_api.chass_preset_max; idx++) {               // For all presets...
-			String name = com_uti.prefs_get(m_context, "chass_preset_name_" + idx, "");
-			String freq = com_uti.prefs_get(m_context, "chass_preset_freq_" + idx, "");
-			if (freq != null && !freq.equals("")) {                         // If non empty frequency (if setting exists)
-				m_presets_curr = idx + 1;                                       // Update number of presets
+		for (int idx = 0; idx < com_api.chass_preset_max; idx++) { // For all presets...
+			String name = com_uti.prefs_get(mContext, "chass_preset_name_" + idx, "");
+			String freq = com_uti.prefs_get(mContext, "chass_preset_freq_" + idx, "");
+			if (freq != null && !freq.equals("")) { // If non empty frequency (if setting exists)
+				m_presets_curr = idx + 1; // Update number of presets
 				m_preset_freq[idx] = freq;
 				m_preset_name[idx] = name;
 
-				if (name != null)
-					m_preset_tv[idx].setText(name);
-				else //if (freq != null && ! freq.equals (""))
-					m_preset_tv[idx].setText("" + ((double) com_uti.getInt(freq)) / 1000);
-				m_preset_ib[idx].setImageResource(R.drawable.transparent);
-				//m_preset_ib [idx].setEnabled (false);
+				mtvPresets[idx].setText(name != null ? name : String.valueOf(((double) com_uti.getInt(freq)) / 1000));
+				mibPresets[idx].setImageResource(R.drawable.transparent);
+				//mibPresets [idx].setEnabled (false);
 			} else {
 				//m_presets_curr = idx + 1;                                     // DISABLED: Update number of presets (For blank ones now too)
 				m_preset_freq[idx] = "";
 				m_preset_name[idx] = "";
-				//m_preset_ib [idx].setImageResource (R.drawable.btn_preset);
-				////m_preset_ib [idx].setEnabled (true);
+				//mibPresets [idx].setImageResource (R.drawable.btn_preset);
+				//mibPresets [idx].setEnabled (true);
 			}
-			m_preset_tv[idx].setTextColor(clr);
+			mtvPresets[idx].setTextColor(color);
 		}
 
 		com_uti.logd("m_presets_curr: " + m_presets_curr);
 	}
 
 
-	private void text_default() {
-		//m_tv_svc_count.setText ("");
-		//m_tv_svc_phase.setText  ("");
-		//m_tv_svc_cdown.setText  ("");
-
+	private void resetAllTextView() {
 		m_tv_pilot.setText("");
-		m_tv_band.setText("");
+		mtvBand.setText("");
 
 		m_tv_rssi.setText("");
 		m_tv_ps.setText("");
 		m_tv_picl.setText("");
 		m_tv_ptyn.setText("");
 		m_tv_rt.setText("");
-		m_tv_rt.setSelected(true);                                     // Need setSelected() for marquis
+		m_tv_rt.setSelected(true); // Need setSelected() for marquis
 	}
 
 
-	private void eq_start() {
+	private void startEqualizer() {
 		int audio_sessid_int = com_uti.getInt(m_com_api.audioSessionId);
 		com_uti.logd("audioSessionId: " + m_com_api.audioSessionId + "  audio_sessid_int: " + audio_sessid_int);
-		try {                                                               // Not every phone/ROM has EQ installed, especially stock ROMs
+		try {
+			// Not every phone/ROM has EQ installed, especially stock ROMs
 			Intent i = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-			i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audio_sessid_int);         //The EXTRA_CONTENT_TYPE extra will help the control panel application customize both the UI layout and the default audio effect settings if none are already stored for the calling application
+
+			/**
+			 * The EXTRA_CONTENT_TYPE extra will help the control panel application customize both the UI layout and the default audio effect settings if none are already stored for the calling application
+			 */
+			i.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audio_sessid_int);
 			mActivity.startActivityForResult(i, 0);
 		} catch (Throwable e) {
 			com_uti.loge("exception");
@@ -670,64 +678,67 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 
 	// Dialog methods:
+	private static final int DAEMON_START_DIALOG = 1; // Daemon start
+	private static final int DAEMON_ERROR_DIALOG = 2; // Daemon error
+	private static final int TUNER_API_ERROR_DIALOG = 3; // Tuner API error
+	private static final int TUNER_ERROR_DIALOG = 4; // Tuner error
+	private static final int FREQ_SET_DIALOG = 5; // Frequency set
+	private static final int GUI_MENU_DIALOG = 6; // Menu
+	private static final int GUI_ABOUT_DIALOG = 7; // About
+	private static final int GUI_TEST_DIALOG = 8; // Test
+	private static final int GUI_DEBUG_DIALOG = 9; // Debug
+	private static final int GUI_SHIM_DIALOG = 10; // Shim
+	private static final int GUI_ACDB_DIALOG = 11; // ACDB Fix
+	private static final int PRESET_CHANGE_DIALOG = 12; // Preset functions
+	private static final int PRESET_RENAME_DIALOG = 14; // Preset rename
 
-	private static final int DAEMON_START_DIALOG = 1;                    // Daemon start
-	private static final int DAEMON_ERROR_DIALOG = 2;                    // Daemon error
-	private static final int TUNER_API_ERROR_DIALOG = 3;                    // Tuner API error
-	private static final int TUNER_ERROR_DIALOG = 4;                    // Tuner error
-	private static final int FREQ_SET_DIALOG = 5;                    // Frequency set
-	private static final int GUI_MENU_DIALOG = 6;                    // Menu
-	private static final int GUI_ABOUT_DIALOG = 7;                    // About
-	private static final int GUI_TEST_DIALOG = 8;                    // Test
-	private static final int GUI_DEBUG_DIALOG = 9;                    // Debug
-	private static final int GUI_SHIM_DIALOG = 10;                    // Shim
-	private static final int GUI_ACDB_DIALOG = 11;                    // ACDB Fix
-	private static final int PRESET_CHANGE_DIALOG = 12;                    // Preset functions
-	private static final int PRESET_RENAME_DIALOG = 14;                    // Preset rename
-
-	public Dialog gap_dialog_create(int id, Bundle args) {               // Create a dialog by calling specific *_dialog_create function    ; Triggered by showDialog (int id);
-		//public DialogFragment gap_dialog_create (int id, Bundle args) {
+	// Create a dialog by calling specific *_dialog_create function
+	// Triggered by showDialog (int id);
+	public Dialog createDialog(int id, Bundle args) {
+		//public DialogFragment createDialog (int id, Bundle args) {
 		com_uti.logd("id: " + id + "  args: " + args);
-		Dialog ret = null;                                                  // DialogFragment ret = null;
+
+		// DialogFragment ret = null;
+		Dialog ret = null;
 		switch (id) {
 			case DAEMON_START_DIALOG:
-				ret = daemon_start_dialog_create(id);
+				ret = createDialogStartDaemon(id);
 				break;
 			case DAEMON_ERROR_DIALOG:
-				ret = daemon_error_dialog_create(id);
+				ret = createDialogErrorDaemon(id);
 				break;
 			case TUNER_API_ERROR_DIALOG:
-				ret = tuner_api_error_dialog_create(id);
+				ret = createDialogTunerApiError(id);
 				break;
 			case TUNER_ERROR_DIALOG:
-				ret = tuner_error_dialog_create(id);
+				ret = createDialogTunerError(id);
 				break;
 			case GUI_MENU_DIALOG:
-				ret = gui_menu_dialog_create(id);
+				ret = createDialogMenu(id);
 				break;
 			case GUI_ABOUT_DIALOG:
-				ret = gui_about_dialog_create(id);
+				ret = createDialogAbout(id);
 				break;
 			case GUI_TEST_DIALOG:
-				ret = gui_test_dialog_create(id);
+				ret = createDialogTest(id);
 				break;
 			case GUI_DEBUG_DIALOG:
-				ret = gui_debug_dialog_create(id);
+				ret = createDialogDebug(id);
 				break;
 			case GUI_SHIM_DIALOG:
-				ret = gui_shim_dialog_create(id);
+				ret = createDialogShim(id);
 				break;
 			case GUI_ACDB_DIALOG:
-				ret = gui_acdb_dialog_create(id);
+				ret = createDialogAcdb(id);
 				break;
 			case FREQ_SET_DIALOG:
-				ret = freq_set_dialog_create(id);
+				ret = createDialogSetFrequency(id);
 				break;
 			case PRESET_CHANGE_DIALOG:
-				ret = preset_change_dialog_create(id);
+				ret = createDialogPresetChange(id);
 				break;
 			case PRESET_RENAME_DIALOG:
-				ret = preset_rename_dialog_create(id);
+				ret = createDialogPresetRename(id);
 				break;
 		}
 		//com_uti.logd ("dialog: " + ret);
@@ -735,20 +746,20 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	}
 
 
-	boolean free = true;
+	boolean free = false;
 
-	private Dialog gui_test_dialog_create(final int id) {
+	private Dialog createDialogTest(final int id) {
 		com_uti.logd("id: " + id);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
 		return (dlg_bldr.create());
 	}
 
-	private Dialog gui_debug_dialog_create(final int id) {
+	private Dialog createDialogDebug(final int id) {
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
 		dlg_bldr.setTitle("Debug");
-		ArrayList<String> array_list = new ArrayList<String>();
+		ArrayList<String> array_list = new ArrayList<>();
 		array_list.add("SHIM");
 		array_list.add("ACDB");
 		array_list.add("Log");
@@ -757,7 +768,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		//array_list.add ("SELinux On");
 		//array_list.add ("SELinux Off");
 
-		dlg_bldr.setOnCancelListener(new DialogInterface.OnCancelListener() {
+		dlg_bldr.setOnCancelListener(new OnCancelListener() {
 			public void onCancel(DialogInterface dialog) {
 			}
 		});
@@ -765,7 +776,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		String[] items = new String[array_list.size()];
 		array_list.toArray(items);
 
-		dlg_bldr.setItems(items, new DialogInterface.OnClickListener() {
+		dlg_bldr.setItems(items, new OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				com_uti.logd("item: " + item);
 				gui_debug_menu_select(item);
@@ -776,28 +787,24 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		return (dlg_bldr.create());
 	}
 
-	public boolean gui_debug_menu_select(int itemid) {
-		int ret = 0;
-		com_uti.logd("itemid: " + itemid);                                 // When "Settings" is selected, after pressing Menu key
-		switch (itemid) {
+	public void gui_debug_menu_select(int itemId) {
+		// When "Settings" is selected, after pressing Menu key
+		com_uti.logd("itemId: " + itemId);
+		switch (itemId) {
 			case 0:
 				mActivity.showDialog(GUI_SHIM_DIALOG);
-				return (true);
+				return;
 			case 1:
 				mActivity.showDialog(GUI_ACDB_DIALOG);
-				return (true);
-			case 2:
-				logs_email();
-				return (true);
+				return;
 			case 3:
 				m_com_api.key_set("audio_mode", "Digital");
-				Toast.makeText(m_context, "audio_mode = Digital", Toast.LENGTH_LONG).show();
-				return (true);
+				Toast.makeText(mContext, "audio_mode = Digital", Toast.LENGTH_LONG).show();
+				return;
 			case 4:
 				m_com_api.key_set("audio_mode", "Analog");
-				Toast.makeText(m_context, "audio_mode = Analog", Toast.LENGTH_LONG).show();
-				return (true);
-/*
+				Toast.makeText(mContext, "audio_mode = Analog", Toast.LENGTH_LONG).show();
+				/*
       case 5:
         ret = com_uti.runCommand ("setenforce 1", true);
         Toast.makeText (mContext, "setenforce 1 ret: " + ret, Toast.LENGTH_LONG).show ();
@@ -809,43 +816,33 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
         return (true);
 */
 		}
-		return (false);                                                     // Not consumed ?
 	}
 
-	private Dialog gui_about_dialog_create(final int id) {
+	private Dialog createDialogAbout(final int id) {
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
 
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
+		dlg_bldr.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
 
 		String menu_msg = "Select Google Play or Cancel";
-		if (free)
-			menu_msg = "Select Google Play or Cancel";//Select Go Pro or Cancel.";
-
 		dlg_bldr.setMessage(menu_msg);
 
-		dlg_bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		dlg_bldr.setNegativeButton("Cancel", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
 
-		dlg_bldr.setNeutralButton("Debug", new DialogInterface.OnClickListener() {
+		dlg_bldr.setNeutralButton("Debug", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				mActivity.showDialog(GUI_DEBUG_DIALOG);                        // Show the Debug dialog
-			}
-		});
-
-		dlg_bldr.setPositiveButton("Google Play", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-				purchase("fm.a2d." + "s2");                                    // Split string to avoid app name change by scripts
 			}
 		});
 
 		return (dlg_bldr.create());
 	}
 
-	private Dialog gui_shim_dialog_create(final int id) {
+	private Dialog createDialogShim(final int id) {
 /*  Code from svc_svc:
       boolean unfriendly_auto_install_and_reboot = false;
       if (unfriendly_auto_install_and_reboot) {
@@ -875,7 +872,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 */
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
 
 		dlg_bldr.setTitle("Bluetooth SHIM");
 
@@ -888,61 +885,59 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		menu_msg += "Select: Remove BT Shim to remove.";
 		dlg_bldr.setMessage(menu_msg);
 
-		dlg_bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		dlg_bldr.setNegativeButton("Cancel", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
 
-		dlg_bldr.setNeutralButton("Install", new DialogInterface.OnClickListener() {
+		dlg_bldr.setNeutralButton("Install", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				if (com_uti.isShimFilesOperational()) {
-					boolean reinstall_destroys_original = true;
-					if (reinstall_destroys_original) {
-						Toast.makeText(m_context, "Shim file already installed. Can't reinstall...", Toast.LENGTH_LONG).show();
-					} else {
-						Toast.makeText(m_context, "Shim file already installed. Reinstalling...", Toast.LENGTH_LONG).show();
+					/*boolean reinstall_destroys_original = true;
+					if (reinstall_destroys_original) {*/
+						Toast.makeText(mContext, "Shim file already installed. Can't reinstall...", Toast.LENGTH_LONG).show();
+					/*} else {
+						Toast.makeText(mContext, "Shim file already installed. Reinstalling...", Toast.LENGTH_LONG).show();
 						com_uti.shimInstall();
-					}
+					}*/
 				} else {
-					Toast.makeText(m_context, "Shim file installing...", Toast.LENGTH_LONG).show();
+					Toast.makeText(mContext, "Shim file installing...", Toast.LENGTH_LONG).show();
 					com_uti.shimInstall();
 				}
 			}
 		});
 
-		dlg_bldr.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+		dlg_bldr.setPositiveButton("Remove", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				if (com_uti.isShimFilesOperational()) {
-					Toast.makeText(m_context, "Shim file installed. Removing...", Toast.LENGTH_LONG).show();
+					Toast.makeText(mContext, "Shim file installed. Removing...", Toast.LENGTH_LONG).show();
 					com_uti.shimRemove();
 				} else
-					Toast.makeText(m_context, "Shim file not installed !!!", Toast.LENGTH_LONG).show();
+					Toast.makeText(mContext, "Shim file not installed !!!", Toast.LENGTH_LONG).show();
 			}
 		});
 
 		return (dlg_bldr.create());
 	}
 
-	private Dialog gui_acdb_dialog_create(final int id) {
+	private Dialog createDialogAcdb(final int id) {
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-		dlg_bldr.setTitle("ACDB Fix");
+		builder.setTitle("ACDB Fix");
 
-		String menu_msg = "";
-		menu_msg += "ACDB Fix is only needed when sound is bad on LG G3, Xperia Z1/2/3.\n\n";
+		String menuMessage = "ACDB Fix is only needed when sound is bad on LG G3, Xperia Z1/2/3.\n\n";
+		menuMessage += "Select: Install to install. Restart SpiritF after 10 seconds.\n";
+		menuMessage += "Select: Remove to remove.";
+		builder.setMessage(menuMessage);
 
-		menu_msg += "Select: Install to install. Restart SpiritF after 10 seconds.\n";
-		menu_msg += "Select: Remove to remove.";
-		dlg_bldr.setMessage(menu_msg);
-
-		dlg_bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {     //
+		builder.setNegativeButton("Cancel", new OnClickListener() {     //
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
 
-		dlg_bldr.setNeutralButton("Install", new DialogInterface.OnClickListener() {
+		builder.setNeutralButton("Install", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
         /*if (com_uti.acdbfix_files_operational_get ()) {
           boolean reinstall_destroys_original = true;
@@ -955,44 +950,41 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
           }
         }
         else {*/
-				Toast.makeText(m_context, "ACDB Fix installing...", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, "ACDB Fix installing...", Toast.LENGTH_LONG).show();
 
 				m_com_api.key_set("tuner_state", "Stop");
 				com_uti.silentSleep(2000);
-				com_uti.acdbfix_install(m_context);
+				com_uti.acdbfix_install(mContext);
 				//}
 			}
 		});
 
-		dlg_bldr.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton("Remove", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				//if (com_uti.acdbfix_files_operational_get ()) {
-				Toast.makeText(m_context, "ACDB Fix installed. Removing...", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, "ACDB Fix installed. Removing...", Toast.LENGTH_LONG).show();
 
 				m_com_api.key_set("tuner_state", "Stop");
 				com_uti.silentSleep(2000);
-				com_uti.acdbfix_remove(m_context);
+				com_uti.acdbfix_remove(mContext);
         /*}
         else
           Toast.makeText (mContext, "ACDB Fix not installed !!!", Toast.LENGTH_LONG).show ();*/
 			}
 		});
 
-		return (dlg_bldr.create());
+		return builder.create();
 	}
 
 
-	private Dialog gui_menu_dialog_create(final int id) {
+	private Dialog createDialogMenu(final int id) {
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
-		ArrayList<String> array_list = new ArrayList<String>();
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
+		dlg_bldr.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
+		ArrayList<String> array_list = new ArrayList<>();
 		array_list.add("Set");
-		if (free)
-			array_list.add("Go Pro");
-		else
-			array_list.add("EQ");
+		array_list.add("EQ");
 		//array_list.add ("SHIM");
 		//array_list.add ("ACDB");
 		array_list.add("About");
@@ -1002,7 +994,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		//array_list.add ("Test");
 		//array_list.add ("Debug");
 
-		dlg_bldr.setOnCancelListener(new DialogInterface.OnCancelListener() {
+		dlg_bldr.setOnCancelListener(new OnCancelListener() {
 			public void onCancel(DialogInterface dialog) {
 			}
 		});
@@ -1010,10 +1002,10 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		String[] items = new String[array_list.size()];
 		array_list.toArray(items);
 
-		dlg_bldr.setItems(items, new DialogInterface.OnClickListener() {
+		dlg_bldr.setItems(items, new OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
 				com_uti.logd("item: " + item);
-				gap_menu_select(item);
+				onMenuSelect(item);
 			}
 
 		});
@@ -1035,14 +1027,11 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	//private static final int MENU_TEST    = 8;
 	//private static final int MENU_DEBUG   = 9;
 
-	public boolean gap_menu_create(Menu menu) {
+	public boolean onMenuCreate(Menu menu) {
 		com_uti.logd("menu: " + menu);
 		try {
 			menu.add(Menu.NONE, MENU_SET, Menu.NONE, "Set").setIcon(R.drawable.ic_menu_preferences);
-			if (free)
-				menu.add(Menu.NONE, MENU_EQ, Menu.NONE, "Go Pro");
-			else
-				menu.add(Menu.NONE, MENU_EQ, Menu.NONE, "EQ");
+			menu.add(Menu.NONE, MENU_EQ, Menu.NONE, "EQ");
 			//menu.add (Menu.NONE, MENU_SHIM,   Menu.NONE,         "SHIM");//.setIcon (R.drawable.ic_menu_view);
 			//menu.add (Menu.NONE, MENU_ACDB,   Menu.NONE,         "ACDB");//.setIcon (R.drawable.ic_menu_help);
 			menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, "About");//.setIcon (R.drawable.ic_menu_info_details);
@@ -1058,17 +1047,14 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		return (true);
 	}
 
-	public boolean gap_menu_select(int itemid) {
+	public boolean onMenuSelect(int itemid) {
 		com_uti.logd("itemid: " + itemid);                                 // When "Settings" is selected, after pressing Menu key
 		switch (itemid) {
 			case MENU_SET:
-				mActivity.startActivity(new Intent(m_context, set_act.class));// Start Settings activity
+				mActivity.startActivity(new Intent(mContext, set_act.class));// Start Settings activity
 				return (true);
 			case MENU_EQ:
-				if (free)
-					purchase("fm.a2d." + "s2");                                  // Split string to avoid app name change by scripts
-				else
-					eq_start();
+				startEqualizer();
 				return (true);
 			case MENU_ABOUT:
 				mActivity.showDialog(GUI_ABOUT_DIALOG);
@@ -1102,219 +1088,191 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private void daemon_start_dialog_dismiss() {
 		com_uti.logd("");
 //    daemon_timeout_stop ();
-		if (daemon_start_dialog != null)
-			daemon_start_dialog.dismiss();
-		daemon_start_dialog = null;
+		if (mDialogDaemonStart != null)
+			mDialogDaemonStart.dismiss();
+		mDialogDaemonStart = null;
 	}
 
-	private Dialog daemon_start_dialog_create(final int id) {
-		//private DialogFragment daemon_start_dialog_create (final int id) {
+	private Dialog createDialogStartDaemon(final int id) {
 		com_uti.logd("id: " + id);
 
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
+		builder.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
 
-		boolean need_daemon = false;
-		String start_msg = "";
+		boolean needDaemon = false;
+		String message = "";
 
 		if (!com_uti.isSuInstalled()) {
-			start_msg += "ERROR: NO SuperUser/SuperSU/Root  SpiritF REQUIRES Root.\n\n";
+			message += "ERROR: NO SuperUser/SuperSU/Root  SpiritF REQUIRES Root.\n\n";
 		} else if (m_com_api.chass_plug_aud.equals("UNK")) {
-			start_msg += "ERROR: Unknown Device. SpiritF REQUIRES International GS1/GS2/GS3/Note/Note2, HTC One, LG G2, Xperia Z+/Qualcomm.\n\n";
+			message += "ERROR: Unknown Device. SpiritF REQUIRES International GS1/GS2/GS3/Note/Note2, HTC One, LG G2, Xperia Z+/Qualcomm.\n\n";
 		} else if (m_com_api.chass_plug_tnr.equals("BCH")) {
-			need_daemon = true;
-			start_msg += "SpiritF Root Daemon Starting...\n\n" +
+			needDaemon = true;
+			message += "SpiritF Root Daemon Starting...\n\n" +
 					"HTC One, LG G2 & Sony Z2+ can take 7 seconds and may REBOOT on install.\n\n";
 		} else {
-			need_daemon = true;
-			start_msg += "SpiritF Root Daemon Starting...\n\n";
+			needDaemon = true;
+			message += "SpiritF Root Daemon Starting...\n\n";
 		}
 
-		if (need_daemon) {
-			//daemon_timeout_start ();
-		}
+		/*if (need_daemon) {
+			daemon_timeout_start();
+		}*/
 
-		dlg_bldr.setMessage(start_msg);
+		builder.setMessage(message);
 
-		daemon_start_dialog = dlg_bldr.create();                           // Save so we can dismiss dialog later
-
-		return (daemon_start_dialog);
+		// Save so we can dismiss dialog later
+		mDialogDaemonStart = builder.create();
+		return mDialogDaemonStart;
 	}
 
-// mActivity.showDialog (DAEMON_ERROR_DIALOG);    // daemon_dialog    daemon_error_dialog_create
+// mActivity.showDialog (DAEMON_ERROR_DIALOG);    // daemon_dialog    createDialogErrorDaemon
 
-	//private int daemon_timeout = 15;                                      // Allow up to 15 seconds for SU prompt to be answered. SuperSU should time itself out by then.
+	// Allow up to 15 seconds for SU prompt to be answered. SuperSU should time itself out by then.
+	//private int daemon_timeout = 15;
 
-	private Dialog daemon_error_dialog_create(final int id) {
+	private Dialog createDialogErrorDaemon(int id) {
 		com_uti.logd("id: " + id);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
 		String daemon_msg = "ERROR: Root Daemon did not start or stop after " + (svc_tnr.service_timeout_daemon_start) + "  seconds.\n\n" +
 				"SpiritF REQUIRES Root and did not get it.\n\n" +
 				"You need to tap System Settings-> About phone-> Build 7 times to enable System Settings-> Developer Options.\n\n" +
 				"Then in Developer Options you need to set Root access to Apps or Apps and ADB.\n\n" +
 				"Check SuperSU app or System Settings->Superuser and ensure SpiritF is enabled..\n\n";
-		dlg_bldr.setMessage(daemon_msg);
-		return (dlg_bldr.create());
+		builder.setMessage(daemon_msg);
+		return builder.create();
 	}
 
-	private Dialog tuner_api_error_dialog_create(final int id) {
+	private Dialog createDialogTunerApiError(int id) {
 		com_uti.logd("id: " + id);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
+		dlg_bldr.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
 		String daemon_msg = "ERROR: Tuner API did not start or stop.\n\n" +
 				"This device may need a kernel with a working FM driver.\n\n";
 		dlg_bldr.setMessage(daemon_msg);
 		return (dlg_bldr.create());
 	}
 
-	private Dialog tuner_error_dialog_create(final int id) {
+	private Dialog createDialogTunerError(final int id) {
 		com_uti.logd("id: " + id);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("SpiritF " + com_uti.app_version_get(m_context));
+		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(mContext);
+		dlg_bldr.setTitle("SpiritF " + com_uti.getApplicationVersion(mContext));
 		String daemon_msg = "ERROR: Tuner did not start or stop.\n\n" +
 				"This device may need a kernel with a working FM driver.\n\n";
 		dlg_bldr.setMessage(daemon_msg);
 		return (dlg_bldr.create());
 	}
 
-	void purchase(String app_name) {                                     // Purchase app_name: fm.a2d.sf
-
-		try {
-			mActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + app_name)));                  // Market only
-			return;   // Done
-		} catch (android.content.ActivityNotFoundException e) {
-			com_uti.loge("There is no Google Play app installed");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
-
-		try {
-			//mActivity.startActivity (new Intent (Intent.ACTION_VIEW, Uri.parse ("http://market.android.com/details?" + app_name))); // Choose browser or market (Browser only if no market)
-			mActivity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + app_name))); // Choose browser or market (Browser only if no market)
-		} catch (android.content.ActivityNotFoundException e) {
-			com_uti.loge("There is no browser or market app installed");
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	// Regional settings:
 
-	private Dialog freq_set_dialog_create(final int id) {                   // Set new frequency
+	/**
+	 * Set new frequency
+	 */
+	private Dialog createDialogSetFrequency(int id) {
 		com_uti.logd("id: " + id);
-		LayoutInflater factory = LayoutInflater.from(m_context);
-		final View edit_text_view = factory.inflate(R.layout.edit_number, null);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("Set Frequency");
-		dlg_bldr.setView(edit_text_view);
-		dlg_bldr.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
+		LayoutInflater factory = LayoutInflater.from(mContext);
+		final View vRoot = factory.inflate(R.layout.edit_number, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Set Frequency");
+		builder.setView(vRoot);
+		builder.setPositiveButton("OK", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-
-				EditText edit_text = (EditText) edit_text_view.findViewById(R.id.edit_number);
-				CharSequence newFreq = edit_text.getEditableText();
-				String nFreq = String.valueOf(newFreq);                        // Get entered text as String
-				freq_set(nFreq);
+				setFrequency(((EditText) vRoot.findViewById(R.id.edit_number)).getText().toString());
 			}
 		});
-		dlg_bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setNegativeButton("Cancel", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
-		return (dlg_bldr.create());
+		return builder.create();
 	}
 
-	// _PRST
-	private Dialog preset_rename_dialog_create(final int id) {                 // Rename preset
-		com_uti.logd("id: " + id);
-		LayoutInflater factory = LayoutInflater.from(m_context);
-		final View edit_text_view = factory.inflate(R.layout.edit_text, null);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("Preset Rename");
-		dlg_bldr.setView(edit_text_view);
-		dlg_bldr.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+	/**
+	 * Rename preset
+	 */
+	private Dialog createDialogPresetRename(int id) {
+		LayoutInflater factory = LayoutInflater.from(mContext);
+		final View vRoot = factory.inflate(R.layout.edit_text, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Preset Rename");
+		builder.setView(vRoot);
+		builder.setPositiveButton("OK", new OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				EditText edit_text = (EditText) edit_text_view.findViewById(R.id.edit_text);
-				CharSequence new_name = edit_text.getEditableText();
-				String name = String.valueOf(new_name);
-				preset_rename(cur_preset_idx, name);
+				setPresetName(cur_preset_idx, ((EditText) vRoot.findViewById(R.id.edit_text)).getText().toString());
 			}
 		});
-		dlg_bldr.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			}
+		builder.setNegativeButton("Cancel", new OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {}
 		});
-		return (dlg_bldr.create());
+		return builder.create();
 	}
 
 
-	private Dialog preset_change_dialog_create(final int id) {
-		com_uti.logd("id: " + id);
-		AlertDialog.Builder dlg_bldr = new AlertDialog.Builder(m_context);
-		dlg_bldr.setTitle("Preset");
-		ArrayList<String> array_list = new ArrayList<String>();
-		//array_list.add ("Tune");
-		array_list.add("Replace");
-		array_list.add("Rename");
-		array_list.add("Delete");
+	private Dialog createDialogPresetChange(int id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle("Preset");
+		ArrayList<String> alItems = new ArrayList<>();
+		//alItems.add("Tune");
+		alItems.add("Replace");
+		alItems.add("Rename");
+		alItems.add("Delete");
 
-		dlg_bldr.setOnCancelListener(new DialogInterface.OnCancelListener() {
-			public void onCancel(DialogInterface dialog) {
-			}
+		builder.setOnCancelListener(new OnCancelListener() {
+			public void onCancel(DialogInterface dialog) { }
 		});
-		String[] items = new String[array_list.size()];
-		array_list.toArray(items);
 
-		dlg_bldr.setItems(items, new DialogInterface.OnClickListener() {
+		builder.setItems(alItems.toArray(new String[alItems.size()]), new OnClickListener() {
 			public void onClick(DialogInterface dialog, int item) {
-
 				switch (item) {
-					case -1:                                                       // Tune to station
-						com_uti.logd("preset_change_dialog_create onClick Tune freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Tune name: " + m_preset_name[cur_preset_idx]);
-						freq_set("" + m_preset_freq[cur_preset_idx]);             // Change to preset frequency
+					case -1: // Tune to station
+						com_uti.logd("createDialogPresetChange onClick Tune freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Tune name: " + m_preset_name[cur_preset_idx]);
+						setFrequency(String.valueOf(m_preset_freq[cur_preset_idx])); // Change to preset frequency
 						break;
-					case 0:                                                       // Replace preset with currently tuned station
-						com_uti.logd("preset_change_dialog_create onClick Replace freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Replace name: " + m_preset_name[cur_preset_idx]);
-						preset_set(cur_preset_idx);
-						com_uti.logd("preset_change_dialog_create onClick Replace freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Replace name: " + m_preset_name[cur_preset_idx]);
+
+					case 0: // Replace preset with currently tuned station
+						com_uti.logd("createDialogPresetChange onClick Replace freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Replace name: " + m_preset_name[cur_preset_idx]);
+						replacePresetByCurrentFrequency(cur_preset_idx);
+						com_uti.logd("createDialogPresetChange onClick Replace freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Replace name: " + m_preset_name[cur_preset_idx]);
 						break;
-					case 1:                                                       // Rename preset
-						com_uti.logd("preset_change_dialog_create onClick Rename freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Rename name: " + m_preset_name[cur_preset_idx]);
+
+					case 1: // Rename preset
+						com_uti.logd("createDialogPresetChange onClick Rename freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Rename name: " + m_preset_name[cur_preset_idx]);
 						mActivity.showDialog(PRESET_RENAME_DIALOG);
-						com_uti.logd("preset_change_dialog_create onClick Rename freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Rename name: " + m_preset_name[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Rename freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Rename name: " + m_preset_name[cur_preset_idx]);
 						break;
-					case 2:                                                       // Delete preset   !! Deletes w/ no confirmation
-						com_uti.logd("preset_change_dialog_create onClick Delete freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Delete name: " + m_preset_name[cur_preset_idx]);
-						preset_delete(cur_preset_idx);
-						com_uti.logd("preset_change_dialog_create onClick Delete freq: " + m_preset_freq[cur_preset_idx]);
-						com_uti.logd("preset_change_dialog_create onClick Delete name: " + m_preset_name[cur_preset_idx]);
+
+					case 2: // Delete preset   !! Deletes w/ no confirmation
+						com_uti.logd("createDialogPresetChange onClick Delete freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Delete name: " + m_preset_name[cur_preset_idx]);
+						removePreset(cur_preset_idx);
+						com_uti.logd("createDialogPresetChange onClick Delete freq: " + m_preset_freq[cur_preset_idx]);
+						com_uti.logd("createDialogPresetChange onClick Delete name: " + m_preset_name[cur_preset_idx]);
 						break;
-					default:                                                      // Should not happen
+
+					default: // Should not happen
 						break;
 				}
 
 			}
 		});
 
-		return (dlg_bldr.create());
+		return builder.create();
 	}
 
 
-	private void freq_set(String nFreq) {
-		if (TextUtils.isEmpty(nFreq)) {                                    // If an empty string...
-			com_uti.loge("nFreq: " + nFreq);
+	private void setFrequency(String nFreq) {
+		// If an empty string...
+		if (nFreq.isEmpty()) {
 			return;
 		}
+
 		Float ffreq = 0f;
 		try {
 			ffreq = Float.valueOf(nFreq);
@@ -1328,35 +1286,30 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 // 4000.0-39999.9
 // 40000.-399999.
 
-		int f_freq_lo = 40000;
-		int f_freq_hi = 399999;
+		int frequencyLower = 40000;
+		int frequencyHigher = 399999;
 
 		int freq = (int) (ffreq * 1000);
 
-		if (freq < f_freq_lo || freq > f_freq_hi * 1000) {
+		if (freq < frequencyLower || freq > frequencyHigher * 1000) {
 			com_uti.loge("1 Frequency invalid ffreq: " + ffreq + "  freq: " + freq);
 			return;
-		} else if (freq >= f_freq_lo * 1 && freq <= f_freq_hi * 1) {    // For 40 - 399
+		} else if (freq <= frequencyHigher) {    // For 40 - 399
 			freq /= 1;
-		} else if (freq >= f_freq_lo * 10 && freq <= f_freq_hi * 10) {    // For 400 - 3999
+		} else if (freq >= frequencyLower * 10 && freq <= frequencyHigher * 10) {    // For 400 - 3999
 			freq /= 10;
-		} else if (freq >= f_freq_lo * 100 && freq <= f_freq_hi * 100) {    // For 4000 - 39999
+		} else if (freq >= frequencyLower * 100 && freq <= frequencyHigher * 100) {    // For 4000 - 39999
 			freq /= 100;
-		} else if (freq >= f_freq_lo * 1000 && freq <= f_freq_hi * 1000) {    // For 40000 - 399999
+		} else if (freq >= frequencyLower * 1000 && freq <= frequencyHigher * 1000) {    // For 40000 - 399999
 			freq /= 1000;
 		}
 
 		if (freq < 0) {
 			com_uti.loge("2 Frequency invalid ffreq: " + ffreq + "  freq: " + freq);
-			return;
 		} else if (freq > 199999 && freq < 400000) {                          // Codes 200.000 - 299.999 / 300.000 - 399.999 = get/set private Broadcom/Qualcomm control
 			m_com_api.key_set("tuner_extension", "" + freq);
 			com_uti.logd("get/set tuner extension: " + freq);
-			return;
-		} else if (freq <= 40001 && freq >= 39999) {                          // Code 40 = logs_email
-			logs_email();
-			return;
-		} else if (freq >= com_uti.band_freq_lo && freq <= com_uti.band_freq_hi) {
+		} else if (freq >= com_uti.bandFrequencyLower && freq <= com_uti.bandFrequencyHigher) {
 			com_uti.logd("Frequency changing to : " + freq + " KHz");
 			m_com_api.key_set("tuner_freq", "" + freq);
 		} else {
@@ -1367,7 +1320,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	// :
 
-	private void gui_pwr_update(boolean pwr) {                            // Enables/disables buttons based on power
+	private void gui_pwr_update(boolean pwr) { // Enables/disables buttons based on power
 		if (pwr) {
 			//m_iv_stop.setImageResource (R.drawable.btn_stop);
 			m_iv_stop.setImageResource(R.drawable.dial_power_on_250sc);
@@ -1376,17 +1329,18 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			//m_iv_stop.setImageResource (R.drawable.btn_play);
 			m_iv_stop.setImageResource(R.drawable.dial_power_off_250sc);
 			m_iv_pwr.setImageResource(R.drawable.dial_power_off);
-			text_default();                                                  // Set all displayable text fields to initial OFF defaults
+			resetAllTextView(); // Set all displayable text fields to initial OFF defaults
 		}
 
 		// Power button is always enabled
-		m_iv_record.setEnabled(true);//pwr);      // Leave record button enabled for debug log
+		mivRecord.setEnabled(true); // Leave record button enabled for debug log
 		m_iv_seekup.setEnabled(pwr);
 		m_iv_seekdn.setEnabled(pwr);
 		m_tv_rt.setEnabled(pwr);
 
-		for (int idx = 0; idx < com_api.chass_preset_max; idx++)                // For all presets...
-			m_preset_ib[idx].setEnabled(pwr);
+		for (int idx = 0; idx < com_api.chass_preset_max; idx++) { // For all presets...
+			mibPresets[idx].setEnabled(pwr);
+		}
 	}
 
 
@@ -1396,7 +1350,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	private int svc_cdown = 0;
 	private String svc_phase = "";
 
-	private android.os.Handler cdown_timeout_handler = null;
+	private Handler cdown_timeout_handler = null;
 	private Runnable cdown_timeout_runnable = null;
 
 	private void cdown_timeout_stop() {
@@ -1420,28 +1374,31 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		svc_cdown = timeout;
 		svc_phase = phase;
 		com_uti.logd("svc_phase: " + svc_phase + "  svc_count: " + svc_count + "  svc_cdown: " + svc_cdown);
-		m_tv_svc_count.setText("" + svc_count);
-		if (cdown_timeout_handler != null)                                  // If there is already a countdown in progress...
-			cdown_timeout_stop();                                            // Stop that countdown
+		m_tv_svc_count.setText(String.valueOf(svc_count));
+		if (cdown_timeout_handler != null) { // If there is already a countdown in progress...
+			cdown_timeout_stop(); // Stop that countdown
+		}
 
-		cdown_timeout_handler = new android.os.Handler();                  // Create Handler to post delayed
-		cdown_timeout_runnable = new Runnable() {                          // Create runnable to be called and re-scheduled every update_interval seconds until timeout or success
+		cdown_timeout_handler = new Handler(); // Create Handler to post delayed
+		cdown_timeout_runnable = new Runnable() { // Create runnable to be called and re-scheduled every update_interval seconds until timeout or success
 			public void run() {
 				svc_cdown -= update_interval;                                   // Count down
 				com_uti.logd("svc_phase: " + svc_phase + "  svc_count: " + svc_count + "  svc_cdown: " + svc_cdown);
 
-				if (svc_cdown > 0) {                                            // If timeout not finished yet... Toast Update
-					Toast.makeText(m_context, "" + svc_cdown + " " + svc_phase, Toast.LENGTH_SHORT).show();
-					m_tv_svc_cdown.setText("" + svc_cdown);                     // Display new countdown
-					if (cdown_timeout_handler != null)                            // Schedule next callback/run in update_interval seconds
+				if (svc_cdown > 0) { // If timeout not finished yet... Toast Update
+					Toast.makeText(mContext, "" + svc_cdown + " " + svc_phase, Toast.LENGTH_SHORT).show();
+					m_tv_svc_cdown.setText(String.valueOf(svc_cdown)); // Display new countdown
+					if (cdown_timeout_handler != null) { // Schedule next callback/run in update_interval seconds
 						cdown_timeout_handler.postDelayed(cdown_timeout_runnable, update_interval * 1000);
-				} else {                                                          // Else if timeout is finished... handle it w/ error code -777 = timeout
+					}
+				} else { // Else if timeout is finished... handle it w/ error code -777 = timeout
 					cdown_error_handle(-777);
 				}
 			}
 		};
-		if (cdown_timeout_handler != null)
+		if (cdown_timeout_handler != null) {
 			cdown_timeout_handler.postDelayed(cdown_timeout_runnable, update_interval * 1000);
+		}
 	}
 
 	private void cdown_error_handle(int err) {
@@ -1473,7 +1430,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		}
 
 		com_uti.loge("err_str: " + err_str);
-		Toast.makeText(m_context, err_str, Toast.LENGTH_LONG).show();
+		Toast.makeText(mContext, err_str, Toast.LENGTH_LONG).show();
 
 		if (m_tv_svc_phase != null) {
 			m_tv_svc_phase.setText(err_str);
@@ -1491,13 +1448,13 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	public void gap_service_update(Intent intent) {
 		//com_uti.logd ("");
 
-		if (false) {//! isGUIInited) {
+		/*if (false) {//! isGUIInited) {
 			com_uti.loge("Sticky broadcast too early: isGUIInited: " + isGUIInited);
 			return;
-		}
+		}*/
 
 		// If daemon is running and daemon start dialog is showing, dismiss dialog
-		if (daemon_start_dialog != null && com_uti.isFileExistSilent("/dev/s2d_running")) {
+		if (mDialogDaemonStart != null && com_uti.isFileExistSilent("/dev/s2d_running")) {
 			daemon_start_dialog_dismiss();
 		}
 
@@ -1527,7 +1484,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 					cdown_timeout_start(m_com_api.chass_phase, cdown);
 				} else if (cdown == 0) {
 					com_uti.loge("cdown: " + cdown);
-				} else if (cdown < 0) {
+				} else {
 					com_uti.logd("cdown: " + cdown);
 					cdown_error_handle(cdown);
 				}
@@ -1536,48 +1493,53 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 		// Audio Session ID:
 
-		int audio_sessid = com_uti.getInt(m_com_api.audioSessionId);
-		if (audio_sessid != 0 && last_audio_sessid_int != audio_sessid) {                        // If audio session ID has changed...
-			last_audio_sessid_int = audio_sessid;
-			com_uti.logd("m_com_api.audioSessionId: " + m_com_api.audioSessionId + "  audioSessionId: " + audio_sessid);
-			if (audio_sessid == 0) {                                          // If no session, do nothing (or stop visual and EQ)
-			} else {                                                            // Else if session...
+		int audioSessionId = com_uti.getInt(m_com_api.audioSessionId);
+		if (audioSessionId != 0 && lastAudioSessidInt != audioSessionId) { // If audio session ID has changed...
+			lastAudioSessidInt = audioSessionId;
+			com_uti.logd("m_com_api.audioSessionId: " + m_com_api.audioSessionId + "  audioSessionId: " + audioSessionId);
+			/*
+			if (audioSessionId == 0) { // If no session, do nothing (or stop visual and EQ)
+			} else { // Else if session...
 			}
+			*/
 		}
 
 		// Mode Buttons at bottom:
 
 		// Mute/Unmute:
-		if (m_com_api.audio_state.equals("Start"))
-			m_iv_paupla.setImageResource(R.drawable.sel_pause);
-		else
-			m_iv_paupla.setImageResource(R.drawable.btn_play);
+		if (m_com_api.audio_state.equals("Start")) {
+			mivPlayPause.setImageResource(R.drawable.sel_pause);
+		} else {
+			mivPlayPause.setImageResource(R.drawable.btn_play);
+		}
 
 		// Speaker/Headset:
-		if (m_com_api.audio_output.equals("Speaker")) {                                  // Else if speaker..., Pressing button goes to headset
-			if (m_iv_output != null)
-				m_iv_output.setImageResource(android.R.drawable.stat_sys_headset);//ic_volume_bluetooth_ad2p);
-			cb_speaker.setChecked(true);
-		} else {                                                              // Pressing button goes to speaker
-			if (m_iv_output != null)
-				m_iv_output.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
-			cb_speaker.setChecked(false);
+		if (m_com_api.audio_output.equals("Speaker")) { // Else if speaker..., Pressing button goes to headset
+			if (mIvOutput != null) {
+				mIvOutput.setImageResource(android.R.drawable.stat_sys_headset);//ic_volume_bluetooth_ad2p);
+			}
+			mcbSpeaker.setChecked(true);
+		} else { // Pressing button goes to speaker
+			if (mIvOutput != null) {
+				mIvOutput.setImageResource(android.R.drawable.ic_lock_silent_mode_off);
+			}
+			mcbSpeaker.setChecked(false);
 		}
 
 		// Record Start/Stop:
 		if (m_com_api.audio_record_state.equals("Start")) {
-			m_iv_record.setImageResource(R.drawable.btn_record_press);
+			mivRecord.setImageResource(R.drawable.btn_record_press);
 		} else {
-			m_iv_record.setImageResource(R.drawable.btn_record);
+			mivRecord.setImageResource(R.drawable.btn_record);
 		}
 
 		// Frequency:
 		int ifreq = (int) (com_uti.getDouble(m_com_api.tuner_freq) * 1000);
-		ifreq = com_uti.tnru_freq_fix(ifreq + 25);                       // Must fix due to floating point rounding need, else 106.1 = 106.099
+		ifreq = com_uti.tnru_freq_fix(ifreq + 25); // Must fix due to floating point rounding need, else 106.1 = 106.099
 
 		String freq = null;
 		if (ifreq >= 50000 && ifreq < 500000) {
-			dial_freq_set(ifreq);
+			setDialFrequency(ifreq);
 			freq = ("" + (double) ifreq / 1000);
 		}
 		if (freq != null) {
@@ -1593,12 +1555,9 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		else
 			m_tv_pilot.setText("");
 
-		m_tv_band.setText(m_com_api.tuner_band);
-
+		mtvBand.setText(m_com_api.tuner_band);
 		m_tv_picl.setText(m_com_api.tuner_rds_picl);
-
 		m_tv_ps.setText(m_com_api.tuner_rds_ps);
-
 		m_tv_ptyn.setText(m_com_api.tuner_rds_ptyn);
 
 		if (!last_rt.equals(m_com_api.tuner_rds_rt)) {
@@ -1614,23 +1573,23 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	// Presets:
 
-	private void preset_delete(int idx) {
+	private void removePreset(int idx) {
 		com_uti.logd("idx: " + idx);
-		m_preset_tv[idx].setText("");
+		mtvPresets[idx].setText("");
 		m_preset_freq[idx] = "";
 		m_preset_name[idx] = "";
-		m_preset_ib[idx].setImageResource(R.drawable.btn_preset);
+		mibPresets[idx].setImageResource(R.drawable.btn_preset);
 		m_com_api.key_set("chass_preset_name_" + idx, "delete", "chass_preset_freq_" + idx, "delete");   // !! Current implementation requires simultaneous
 	}
 
-	private void preset_rename(int idx, String name) {
+	private void setPresetName(int idx, String name) {
 		com_uti.logd("idx: " + idx);
-		m_preset_tv[idx].setText(name);
+		mtvPresets[idx].setText(name);
 		m_preset_name[idx] = name;
 		m_com_api.key_set("chass_preset_name_" + idx, name, "chass_preset_freq_" + idx, m_preset_freq[idx]);   // !! Current implementation requires simultaneous
 	}
 
-	private void preset_set(int idx) {
+	private void replacePresetByCurrentFrequency(int idx) {
 		if (idx >= com_api.chass_preset_max) {
 			com_uti.loge("idx: " + idx + "  com_api.chass_preset_max: " + com_api.chass_preset_max + "  m_presets_curr: " + m_presets_curr);
 			return;
@@ -1655,18 +1614,19 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			if (!m_com_api.tuner_rds_picl.equals(""))
 				freq_text = m_com_api.tuner_rds_picl;
 		} else {
-			if (!m_com_api.tuner_rds_ps.trim().equals(""))
+			if (!m_com_api.tuner_rds_ps.trim().equals("")) {
 				freq_text = m_com_api.tuner_rds_ps;
+			}
 		}
 
 		if (m_presets_curr < idx + 1)
 			m_presets_curr = idx + 1;                                         // Update number of presets
 
-		m_preset_tv[idx].setText("" + freq_text);
+		mtvPresets[idx].setText(freq_text);
 		m_preset_name[idx] = freq_text;
 		m_preset_freq[idx] = m_com_api.tuner_freq;
 		m_com_api.key_set("chass_preset_name_" + idx, "" + freq_text, "chass_preset_freq_" + idx, m_com_api.tuner_freq);   // !! Current implementation requires simultaneous
-		m_preset_ib[idx].setImageResource(R.drawable.transparent);  // R.drawable.btn_preset
+		mibPresets[idx].setImageResource(R.drawable.transparent);  // R.drawable.btn_preset
 	}
 
 	private View.OnClickListener preset_select_lstnr = new                // Tap: Tune to preset
@@ -1676,14 +1636,14 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 					com_uti.logd("view: " + v);
 
 					for (int idx = 0; idx < com_api.chass_preset_max; idx++) {       // For all presets...
-						if (v == m_preset_ib[idx]) {                                   // If this preset...
+						if (v == mibPresets[idx]) {                                   // If this preset...
 							com_uti.logd("idx: " + idx);
 							try {
 								if (m_preset_freq[idx].equals(""))                        // If no preset yet...
 									//RE-ENABLED because it's a pain      com_uti.loge ("Must long press to press presets now, to avoid accidental sets");
-									preset_set(idx);                                         // Set preset
+									replacePresetByCurrentFrequency(idx);                                         // Set preset
 								else
-									freq_set("" + m_preset_freq[idx]);                      // Else change to preset frequency
+									setFrequency("" + m_preset_freq[idx]);                      // Else change to preset frequency
 							} catch (Throwable e) {
 								e.printStackTrace();
 							}
@@ -1697,22 +1657,23 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	private int cur_preset_idx = 0;
 	// Long press/Tap and Hold: Show preset change options
-	private View.OnLongClickListener preset_change_lstnr = new View.OnLongClickListener() {
+	private OnLongClickListener preset_change_lstnr = new OnLongClickListener() {
 		public boolean onLongClick(View v) {
 			ani(v);
 			com_uti.logd("view: " + v);
-			for (int idx = 0; idx < com_api.chass_preset_max; idx++) {            // For all presets...
-				if (v == m_preset_ib[idx]) {                                   // If this preset...
+			for (int idx = 0; idx < com_api.chass_preset_max; idx++) { // For all presets...
+				if (v == mibPresets[idx]) { // If this preset...
 					cur_preset_idx = idx;
 					com_uti.logd("idx: " + idx);
-					if (m_preset_freq[idx].equals(""))                          // If no preset yet...
-						preset_set(idx);                                           // Set preset
-					else
-						mActivity.showDialog(PRESET_CHANGE_DIALOG);                // Else show preset options dialog
+					if (m_preset_freq[idx].equals("")) { // If no preset yet...
+						replacePresetByCurrentFrequency(idx); // Set preset
+					} else {
+						mActivity.showDialog(PRESET_CHANGE_DIALOG); // Else show preset options dialog
+					}
 					break;
 				}
 			}
-			return (true);                                                    // Consume long click
+			return true; // Consume long click
 		}
 	};
 
@@ -1725,22 +1686,19 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 	}
 
 
-	private View.OnLongClickListener long_click_lstnr = new
-			View.OnLongClickListener() {
-				public boolean onLongClick(View v) {
-					com_uti.logd("view: " + v);
-					ani(v);                                                          // Animate button
-					if (v == m_iv_menu) {
-						mActivity.startActivity(new Intent(m_context, set_act.class));// Start Settings activity
-					} else if (v == m_iv_record) {
-						logs_email();
-					} else {
-						com_uti.loge("view: " + v);
-						return (false);                                                 // Don't consume long click
-					}
-					return (true);                                                    // Consume long click
-				}
-			};
+	private OnLongClickListener long_click_lstnr = new OnLongClickListener() {
+		public boolean onLongClick(View v) {
+			com_uti.logd("view: " + v);
+			ani(v); // Animate button
+			if (v == m_iv_menu) {
+				mActivity.startActivity(new Intent(mContext, set_act.class));// Start Settings activity
+			} else {
+				com_uti.loge("view: " + v);
+				return false; // Don't consume long click
+			}
+			return true; // Consume long click
+		}
+	};
 
 	private View.OnClickListener short_click_lstnr = new View.OnClickListener() {
 		public void onClick(View v) {
@@ -1752,7 +1710,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 			} else if (v == m_iv_menu)
 				mActivity.showDialog(GUI_MENU_DIALOG);
 
-			else if (v == m_iv_paupla)
+			else if (v == mivPlayPause)
 				m_com_api.key_set("audio_state", "Toggle");
 
 			else if (v == m_iv_stop) {
@@ -1761,7 +1719,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				//  m_com_api.key_set ("tuner_state", "Stop");                      // Full power down/up
 				//else
 				//  m_com_api.key_set ("tuner_state", "Start");                     // Tuner only start, no audio
-			} else if (v == m_iv_record)
+			} else if (v == mivRecord)
 				m_com_api.key_set("audio_record_state", "Toggle");
 
 			else if (v == m_tv_freq)                                          // Frequency direct entry
@@ -1774,13 +1732,13 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 				m_com_api.key_set("tuner_freq", "Up");
 
 			else if (v == m_iv_volume) {
-				AudioManager m_am = (AudioManager) m_context.getSystemService(Context.AUDIO_SERVICE);
+				AudioManager m_am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
 				if (m_am != null) {
 					int stream_vol = m_am.getStreamVolume(svc_aud.audio_stream);
 					com_uti.logd("stream_vol : " + stream_vol);                  // Set to current volume (no change) to display system volume change dialog for user input on screen
 					m_am.setStreamVolume(svc_aud.audio_stream, stream_vol, AudioManager.FLAG_SHOW_UI);
 				}
-			} else if (v == m_iv_output) {
+			} else if (v == mIvOutput) {
 				if (m_com_api.audio_output.equals("Speaker"))        // If speaker..., Pressing button goes to headset
 					m_com_api.key_set("audio_output", "Headset");
 				else
@@ -1802,7 +1760,7 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	// Handle GUI clicks for 2nd page settings:
 
-	public void gap_gui_clicked(View view) {                             // See res/layout/gui_pg2_layout.xml & MainActivity
+	public void onClicked(View view) {                             // See res/layout/gui_pg2_layout.xml & MainActivity
 		int id = view.getId();
 		com_uti.logd("id: " + id + "  view: " + view);
 		switch (id) {
@@ -1812,9 +1770,9 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 			case R.id.cb_visu:
 				if (((CheckBox) view).isChecked())
-					visualizer_state_set("Start");
+					setVisualizerState("Start");
 				else
-					visualizer_state_set("Stop");
+					setVisualizerState("Stop");
 				break;
 
 			case R.id.cb_tuner_stereo:
@@ -1856,48 +1814,39 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 
 	// Preferences:
 
-	private void load_prefs() {
+	private void loadPreferences() {
 		String value;
-		value = com_uti.prefs_get(m_context, "audio_output", "");
-		if (value.equals("Speaker"))
-			cb_speaker.setChecked(true);
-		else
-			cb_speaker.setChecked(false);
+		value = com_uti.prefs_get(mContext, "audio_output", "");
 
-		value = com_uti.prefs_get(m_context, "tuner_stereo", "");
-		if (value.equals("Mono"))
-			((CheckBox) mActivity.findViewById(R.id.cb_tuner_stereo)).setChecked(false);
-		else
-			((CheckBox) mActivity.findViewById(R.id.cb_tuner_stereo)).setChecked(true);
+		mcbSpeaker.setChecked(value.equals("Speaker"));
 
-		value = com_uti.prefs_get(m_context, "audio_stereo", "");
-		if (value.equals("Mono"))
-			((CheckBox) mActivity.findViewById(R.id.cb_audio_stereo)).setChecked(false);
-		else
-			((CheckBox) mActivity.findViewById(R.id.cb_audio_stereo)).setChecked(true);
+		value = com_uti.prefs_get(mContext, "tuner_stereo", "");
+		((CheckBox) mActivity.findViewById(R.id.cb_tuner_stereo)).setChecked(!value.equals("Mono"));
+
+		value = com_uti.prefs_get(mContext, "audio_stereo", "");
+		((CheckBox) mActivity.findViewById(R.id.cb_audio_stereo)).setChecked(!value.equals("Mono"));
 
 		((CheckBox) mActivity.findViewById(R.id.cb_visu)).setChecked(false);
 	}
 
-	private String visualizer_state_set(String state) {
+	private void setVisualizerState(String state) {
 		com_uti.logd("state: " + state);
 		if (state.equals("Start")) {
-			((LinearLayout) mActivity.findViewById(R.id.vis)).setVisibility(View.VISIBLE);  //dial_init
+			((LinearLayout) mActivity.findViewById(R.id.vis)).setVisibility(View.VISIBLE);  //initDial
 
-			m_dial.setVisibility(View.INVISIBLE);
+			mDial.setVisibility(View.INVISIBLE);
 			m_iv_pwr.setVisibility(View.INVISIBLE);
-			((ImageView) mActivity.findViewById(R.id.frequency_bar)).setVisibility(View.INVISIBLE);
+			mActivity.findViewById(R.id.frequency_bar).setVisibility(View.INVISIBLE);
 
 			int audio_sessid = com_uti.getInt(m_com_api.audioSessionId);
 		} else {
-			((LinearLayout) mActivity.findViewById(R.id.vis)).setVisibility(View.INVISIBLE);//GONE);
+			mActivity.findViewById(R.id.vis).setVisibility(View.INVISIBLE);//GONE);
 
-			m_dial.setVisibility(View.VISIBLE);
+			mDial.setVisibility(View.VISIBLE);
 			m_iv_pwr.setVisibility(View.VISIBLE);
-			((ImageView) mActivity.findViewById(R.id.frequency_bar)).setVisibility(View.VISIBLE);
+			mActivity.findViewById(R.id.frequency_bar).setVisibility(View.VISIBLE);
 
 		}
-		return (state);                                                     // No error
 	}
 
 	void tuner_band_set(String band) {
@@ -1979,53 +1928,5 @@ public class MainGUI implements gui_gap {//, gui_dlg.gui_dlg_lstnr {
 		return cmd;
 	}
 
-	private boolean file_email(String subject, String filename) {        // See http://stackoverflow.com/questions/2264622/android-multiple-email-attachment-using-intent-question
-		Intent i = new Intent(Intent.ACTION_SEND);
-		i.setType("message/rfc822");                                       // Doesn't work well: i.setType ("text/plain");
-		i.putExtra(Intent.EXTRA_EMAIL, new String[]{"mikereidis@gmail.com"});
-		i.putExtra(Intent.EXTRA_SUBJECT, subject);
-		i.putExtra(Intent.EXTRA_TEXT, "Please write write problem, device/model and ROM/version. Please ensure " + filename + " file is actually attached or send manually. Thanks ! Mike.");
-		i.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filename)); // File -> attachment
-		try {
-			mActivity.startActivity(Intent.createChooser(i, "Send email..."));
-		} catch (android.content.ActivityNotFoundException e) {
-			Toast.makeText(m_context, "No email. Manually send " + filename, Toast.LENGTH_LONG).show();
-		}
-		//dlg_dismiss (DLG_WAIT);
-		return (true);
-	}
-
-	private int long_logs_email() {
-		String cmd = "bugreport > " + logfile;
-		if (new_logs) {
-			logfile = "/sdcard/spirit2log.txt";
-			com_uti.daemon_set("audio_alsa_log", "1");                       // Log ALSA controls
-			cmd = new_logs_cmd_get();
-		}
-		m_com_api.service_update_send(null, "Writing Debug Log", "20");    // Send Phase Update
-		int ret = com_uti.runCommand(cmd, true);                              // Run "bugreport" and output to file
-		m_com_api.service_update_send(null, "Sending Debug Log", "20");    // Send Phase Update
-
-		String subject = "SpiritF " + com_uti.app_version_get(m_context);
-		boolean bret = file_email(subject, logfile);                       // Email debug log file
-		m_com_api.service_update_send(null, "Success Sending Debug Log", "0");// Send Success Update
-
-		return (0);
-	}
-
-	private class logs_email_tmr_hndlr extends java.util.TimerTask {
-		public void run() {
-			int ret = long_logs_email();
-			com_uti.logd("done ret: " + ret);
-		}
-	}
-
-	private int logs_email() {
-		int ret = 0;
-		Timer logs_email_tmr = new Timer("Logs Email", true);
-		logs_email_tmr.schedule(new logs_email_tmr_hndlr(), 10);        // Once after 0.01 seconds.
-		Toast.makeText(m_context, "Please wait while debug log is collected. Will prompt when done...", Toast.LENGTH_LONG).show();
-		return ret;
-	}
 
 }
